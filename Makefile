@@ -20,6 +20,9 @@ libs: build/lib/libbitvector.a
 
 tests: build/bin/test_1 build/bin/test_2 build/bin/bench_1
 
+check: tests
+	@build/bin/test_1 && echo "PASSED"
+
 clean: ; rm -fr build
 
 backup: clean

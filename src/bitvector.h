@@ -45,6 +45,31 @@ struct bitwidth
 };
 
 /*------------------.
+| integer.          |
+`------------------*/
+
+template<size_t _size, bool _signed = true>
+struct integer {
+	typedef typename std::conditional<
+		_size == 8,
+		typename std::conditional<_signed, int8_t, uint8_t>::type,
+		typename std::conditional<
+			_size == 16,
+			typename std::conditional<_signed, int16_t, uint16_t>::type,
+			typename std::conditional<
+				_size == 32,
+				typename std::conditional<_signed, int32_t, uint32_t>::type,
+				typename std::conditional<
+					_size == 64,
+					typename std::conditional<_signed, int64_t, uint64_t>::type,
+					void
+				>::type
+			>::type
+		>::type
+	>::type type;
+};
+
+/*------------------.
 | bitvector.        |
 `------------------*/
 
@@ -61,10 +86,8 @@ struct bitvector
 	};
 
 	/*! limb type */
-	typedef unsigned int limb_t;
-	typedef unsigned long long limb2_t;
-	typedef signed long long slimb2_t;
-
+	typedef integer<limb_bits, false>::type limb_t;
+	typedef integer<limb_bits*2, false>::type limb2_t;
 
 	/*------------------.
 	| member variables. |

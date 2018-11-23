@@ -545,7 +545,7 @@ void bitvector::divrem(const bitvector &dividend, const bitvector &divisor, bitv
 		}
 		// Multiply and subtract.
 		limb2_t k = 0;
-		slimb2_t t = 0;
+		integer<limb_bits*2, true>::type t = 0;
 		for (ptrdiff_t i = 0; i < n; i++) {
 			unsigned long long p = qhat*vn[i];
 			t = un[i+j] - k - (p & ((1ULL<<limb_bits)-1));

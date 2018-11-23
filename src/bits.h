@@ -33,7 +33,7 @@ template<> inline size_t clz(unsigned val)
 template<> inline size_t clz(unsigned long long val)
 {
 	unsigned long count;
-	return _BitScanReverse(&count, val) ^ 31;
+	return _BitScanReverse64(&count, val) ^ 63;
 }
 #endif
 

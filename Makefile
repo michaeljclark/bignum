@@ -38,9 +38,6 @@ build/obj/%.o: src/%.cpp
 build/obj/%.o: tests/%.cpp
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $<
 
-build/obj/%.o: demo/%.cpp
-	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(EDIT_CFLAGS) -c -o $@ $<
-
 build/lib/libbitvector.a: $(BITVECTOR_OBJS)
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 

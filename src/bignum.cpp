@@ -447,11 +447,12 @@ bool bignum::operator!() const { return *this == 0; }
 | multply and divide. |
 `--------------------*/
 
-/* These routines are derived from Hacker's Delight */
-
 /*! base 2^limb_bits multiply */
 void bignum::mult(const bignum &multiplicand, const bignum multiplier, bignum &result)
 {
+	/* This routine is derived from Hacker's Delight,
+	 * and possibly originates from Knuth */
+
 	size_t m = multiplicand.num_limbs(), n = multiplier.num_limbs();
 	size_t k = std::min(multiplicand.max_limbs(), m + n);
 	result._resize(k);
@@ -483,6 +484,9 @@ void bignum::mult(const bignum &multiplicand, const bignum multiplier, bignum &r
 /*! base 2^limb_bits division */
 void bignum::divrem(const bignum &dividend, const bignum &divisor, bignum &quotient, bignum &remainder)
 {
+	/* This routine is derived from Hacker's Delight,
+	 * and possibly originates from Knuth */
+
 	quotient = 0;
 	remainder = 0;
 	ptrdiff_t m = dividend.num_limbs(), n = divisor.num_limbs();

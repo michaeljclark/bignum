@@ -70,10 +70,10 @@ struct integer {
 };
 
 /*------------------.
-| bitvector.        |
+| bignum.           |
 `------------------*/
 
-struct bitvector
+struct bignum
 {
 	/*------------------.
 	| type definitions. |
@@ -108,25 +108,25 @@ struct bitvector
 	`--------------*/
 
 	/*! empty constructor */
-	bitvector(const signedness s = is_unsigned(), const bitwidth bits = 0);
+	bignum(const signedness s = is_unsigned(), const bitwidth bits = 0);
 
 	/*! integral constructor */
-	bitvector(const limb_t n, const signedness s = is_unsigned(), const bitwidth bits = 0);
+	bignum(const limb_t n, const signedness s = is_unsigned(), const bitwidth bits = 0);
 
 	/*! array constructor */
-	bitvector(const std::initializer_list<limb_t> l, const signedness s =  is_unsigned(), const bitwidth bits = 0);
+	bignum(const std::initializer_list<limb_t> l, const signedness s =  is_unsigned(), const bitwidth bits = 0);
 
 	/*! string constructor */
-	bitvector(std::string str, const signedness s =  is_unsigned(), const bitwidth bits = 0);
+	bignum(std::string str, const signedness s =  is_unsigned(), const bitwidth bits = 0);
 
 	/*! string constructor with radix */
-	bitvector(std::string str, const size_t radix, const signedness s =  is_unsigned(), const bitwidth bits = 0);
+	bignum(std::string str, const size_t radix, const signedness s =  is_unsigned(), const bitwidth bits = 0);
 
 	/*! copy constructor */
-	bitvector(const bitvector &operand);
+	bignum(const bignum &operand);
 
 	/*! move constructor */
-	bitvector(const bitvector&& operand) noexcept;
+	bignum(const bignum&& operand) noexcept;
 
 
 	/*----------------------.
@@ -134,13 +134,13 @@ struct bitvector
 	`----------------------*/
 
 	/*! integral copy assignment operator */
-	bitvector& operator=(const limb_t l);
+	bignum& operator=(const limb_t l);
 
-	/*! bitvector copy assignment operator */
-	bitvector& operator=(const bitvector &operand);
+	/*! bignum copy assignment operator */
+	bignum& operator=(const bignum &operand);
 
-	/*! bitvector move assignment operator */
-	bitvector& operator=(bitvector &&operand);
+	/*! bignum move assignment operator */
+	bignum& operator=(bignum &&operand);
 
 
 	/*------------------.
@@ -148,7 +148,7 @@ struct bitvector
 	`------------------*/
 
 	/*! expand limbs to match operand */
-	void _expand(const bitvector &operand);
+	void _expand(const bignum &operand);
 
 	/*! contract zero big end limbs */
 	void _contract();
@@ -191,52 +191,52 @@ struct bitvector
 	`---------------------------------------------*/
 
 	/*! add with carry equals */
-	bitvector& operator+=(const bitvector &operand);
+	bignum& operator+=(const bignum &operand);
 
 	/*! subtract with borrow equals */
-	bitvector& operator-=(const bitvector &operand);
+	bignum& operator-=(const bignum &operand);
 
 	/*! left shift equals */
-	bitvector& operator<<=(size_t shamt);
+	bignum& operator<<=(size_t shamt);
 
 	/*! right shift equals */
-	bitvector& operator>>=(size_t shamt);
+	bignum& operator>>=(size_t shamt);
 
 	/*! bitwise and equals */
-	bitvector& operator&=(const bitvector &operand);
+	bignum& operator&=(const bignum &operand);
 
 	/*! bitwise or equals */
-	bitvector& operator|=(const bitvector &operand);
+	bignum& operator|=(const bignum &operand);
 
 	/*! bitwise xor equals */
-	bitvector& operator^=(const bitvector &operand);
+	bignum& operator^=(const bignum &operand);
 
 	/*! add with carry */
-	bitvector operator+(const bitvector &operand) const;
+	bignum operator+(const bignum &operand) const;
 
 	/*! subtract with borrow */
-	bitvector operator-(const bitvector &operand) const;
+	bignum operator-(const bignum &operand) const;
 
 	/*! left shift */
-	bitvector operator<<(size_t shamt) const;
+	bignum operator<<(size_t shamt) const;
 
 	/*! right shift */
-	bitvector operator>>(size_t shamt) const;
+	bignum operator>>(size_t shamt) const;
 
 	/*! bitwise and */
-	bitvector operator&(const bitvector &operand) const;
+	bignum operator&(const bignum &operand) const;
 
 	/*! bitwise or */
-	bitvector operator|(const bitvector &operand) const;
+	bignum operator|(const bignum &operand) const;
 
 	/*! bitwise xor */
-	bitvector operator^(const bitvector &operand) const;
+	bignum operator^(const bignum &operand) const;
 
 	/*! bitwise not */
-	bitvector operator~() const;
+	bignum operator~() const;
 
 	/*! negate */
-	bitvector operator-() const;
+	bignum operator-() const;
 
 
 	/*----------------------.
@@ -244,22 +244,22 @@ struct bitvector
 	`----------------------*/
 
 	/*! equals */
-	bool operator==(const bitvector &operand) const;
+	bool operator==(const bignum &operand) const;
 
 	/*! less than */
-	bool operator<(const bitvector &operand) const;
+	bool operator<(const bignum &operand) const;
 
 	/*! not equals */
-	bool operator!=(const bitvector &operand) const;
+	bool operator!=(const bignum &operand) const;
 
 	/*! less than or equal*/
-	bool operator<=(const bitvector &operand) const;
+	bool operator<=(const bignum &operand) const;
 
 	/*! greater than */
-	bool operator>(const bitvector &operand) const;
+	bool operator>(const bignum &operand) const;
 
 	/*! less than or equal*/
-	bool operator>=(const bitvector &operand) const;
+	bool operator>=(const bignum &operand) const;
 
 	/*! not */
 	bool operator!() const;
@@ -270,41 +270,41 @@ struct bitvector
 	`-------------------------*/
 
 	/*! base 2^limb_bits multiply */
-	static void mult(const bitvector &multiplicand, const bitvector multiplier, bitvector &result);
+	static void mult(const bignum &multiplicand, const bignum multiplier, bignum &result);
 
 	/*! base 2^limb_bits division */
-	static void divrem(const bitvector &dividend, const bitvector &divisor, bitvector &quotient, bitvector &remainder);
+	static void divrem(const bignum &dividend, const bignum &divisor, bignum &quotient, bignum &remainder);
 
 	/*! multiply */
-	bitvector operator*(const bitvector &operand) const;
+	bignum operator*(const bignum &operand) const;
 
 	/*! division quotient */
-	bitvector operator/(const bitvector &divisor) const;
+	bignum operator/(const bignum &divisor) const;
 
 	/*! division remainder */
-	bitvector operator%(const bitvector &divisor) const;
+	bignum operator%(const bignum &divisor) const;
 
 	/*! multiply equals */
-	bitvector& operator*=(const bitvector &operand);
+	bignum& operator*=(const bignum &operand);
 
 	/*! divide equals */
-	bitvector& operator/=(const bitvector &operand);
+	bignum& operator/=(const bignum &operand);
 
 	/*! modulus equals */
-	bitvector& operator%=(const bitvector &operand);
+	bignum& operator%=(const bignum &operand);
 
 	/*! raise to the power */
-	bitvector pow(size_t exp) const;
+	bignum pow(size_t exp) const;
 
 
 	/*-------------------.
 	| string conversion. |
 	`-------------------*/
 
-	/*! convert bitvector to string */
+	/*! convert bignum to string */
 	std::string to_string(size_t radix = 10) const;
 
-	/*! convert bitvector from string */
+	/*! convert bignum from string */
 	void from_string(const char *str, size_t len, size_t radix);
 
 };
@@ -315,11 +315,11 @@ struct bitvector
 
 struct inttype
 {
-	bitvector v;
+	bignum v;
 	inttype() = delete;
-	inttype(const bitvector::limb_t n, const signedness s, const bitwidth b) : v(n, s, b) {}
-	inttype(const std::initializer_list<bitvector::limb_t> l, const signedness s, const bitwidth b) : v(l, s, b) {}
-	operator const bitvector& () const { return v; }
+	inttype(const bignum::limb_t n, const signedness s, const bitwidth b) : v(n, s, b) {}
+	inttype(const std::initializer_list<bignum::limb_t> l, const signedness s, const bitwidth b) : v(l, s, b) {}
+	operator const bignum& () const { return v; }
 	inttype& operator = (const inttype &) = default; 
 };
 

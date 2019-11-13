@@ -1,6 +1,6 @@
-# bitvector
+# bignum
 
-C++ bitvector with support for arbitrary precision integer arithmetic.
+C++ bignum with support for arbitrary precision integer arithmetic.
 
 - bit vector with bignum support using 32-bit limbs.
 - supports static or dynamic width.
@@ -9,17 +9,17 @@ C++ bitvector with support for arbitrary precision integer arithmetic.
 - multiplication and division algorithm from Hacker's Delight.
 - divide and conquer algorithm for radix 10 conversion to string.
 
-### Example code for C++ bitvector bignum arithmetic:
+### Example code for C++ bignum arithmetic:
 
 ```
 #include <iostream>
 
-#include <bitvector.h>
+#include <bignum.h>
 
 int main()
 {
-	bitvector x = 2;
-	bitvector y = x.pow(4096);
+	bignum x = 2;
+	bignum y = x.pow(4096);
 	std::cout << y.to_string(10) << std::endl;
 }
 ```
@@ -47,36 +47,36 @@ int main()
 }
 ```
 
-## bitvector API
+## bignum API
 
-bitvector implements the following operators and methods:
+bignum implements the following operators and methods:
 
-- bitvector(unsigned int n)
-- bitvector(std::string str, size_t radix)
-- bitvector& operator+=(const bitvector &operand)
-- bitvector& operator-=(const bitvector &operand)
-- bitvector& operator<<=(int shamt)
-- bitvector& operator>>=(int shamt)
-- bitvector& operator&=(const bitvector &operand)
-- bitvector& operator|=(const bitvector &operand)
-- bitvector operator+(const bitvector &operand) const
-- bitvector operator-(const bitvector &operand) const
-- bitvector operator<<(int shamt) const
-- bitvector operator>>(int shamt) const
-- bitvector operator&(const bitvector &operand) const
-- bitvector operator|(const bitvector &operand) const
-- bool operator==(const bitvector &operand) const
-- bool operator<(const bitvector &operand) const
-- bool operator!=(const bitvector &operand) const
-- bool operator<=(const bitvector &operand) const
-- bool operator>(const bitvector &operand) const
-- bool operator>=(const bitvector &operand) const
+- bignum(unsigned int n)
+- bignum(std::string str, size_t radix)
+- bignum& operator+=(const bignum &operand)
+- bignum& operator-=(const bignum &operand)
+- bignum& operator<<=(int shamt)
+- bignum& operator>>=(int shamt)
+- bignum& operator&=(const bignum &operand)
+- bignum& operator|=(const bignum &operand)
+- bignum operator+(const bignum &operand) const
+- bignum operator-(const bignum &operand) const
+- bignum operator<<(int shamt) const
+- bignum operator>>(int shamt) const
+- bignum operator&(const bignum &operand) const
+- bignum operator|(const bignum &operand) const
+- bool operator==(const bignum &operand) const
+- bool operator<(const bignum &operand) const
+- bool operator!=(const bignum &operand) const
+- bool operator<=(const bignum &operand) const
+- bool operator>(const bignum &operand) const
+- bool operator>=(const bignum &operand) const
 - bool operator!() const
-- bitvector operator*=(const bitvector &operand)
-- bitvector operator/=(const bitvector &divisor)
-- bitvector operator%=(const bitvector &divisor)
-- bitvector operator*(const bitvector &operand) const
-- bitvector operator/(const bitvector &divisor) const
-- bitvector operator%(const bitvector &divisor) const
+- bignum operator*=(const bignum &operand)
+- bignum operator/=(const bignum &divisor)
+- bignum operator%=(const bignum &divisor)
+- bignum operator*(const bignum &operand) const
+- bignum operator/(const bignum &divisor) const
+- bignum operator%(const bignum &divisor) const
 - void from_string(std::string, size_t radix = 0 /*autodetect*/)
 - std::string to_string(size_t radix = 10) const

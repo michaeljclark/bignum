@@ -7,16 +7,16 @@ DEBUG_FLAGS = -g
 OPT_FLAGS   = -O3
 WARN_FLAGS  = -Wall
 CXXFLAGS    = $(DEBUG_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(INCLUDES) -std=c++11
-LDFLAGS     = -L/usr/local/lib -Lbuild/lib -lbitvector
+LDFLAGS     = -L/usr/local/lib -Lbuild/lib -lbignum
 
 
-BITVECTOR_OBJS    = build/obj/bitvector.o
+BIGNUM_OBJS    = build/obj/bignum.o
 
 # build targets
 
 all: libs
 
-libs: build/lib/libbitvector.a
+libs: build/lib/libbignum.a
 
 tests: build/bin/test_1 build/bin/test_2 build/bin/bench_1
 
@@ -38,8 +38,8 @@ build/obj/%.o: src/%.cpp
 build/obj/%.o: tests/%.cpp
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $<
 
-build/lib/libbitvector.a: $(BITVECTOR_OBJS)
+build/lib/libbignum.a: $(BIGNUM_OBJS)
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 
-build/bin/%: build/obj/%.o build/lib/libbitvector.a
+build/bin/%: build/obj/%.o build/lib/libbignum.a
 	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS) -lgmp

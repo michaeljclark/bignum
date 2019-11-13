@@ -3,14 +3,14 @@
 #include <cstdio>
 #include <chrono>
 
-#include <bitvector.h>
+#include <bignum.h>
 #include <gmp.h>
 
 void test_bit(int a, int b)
 {
-	bitvector c = a;
+	bignum c = a;
 	auto t1 = std::chrono::system_clock::now();
-	bitvector d = c.pow(b);
+	bignum d = c.pow(b);
 	auto t2 = std::chrono::system_clock::now();
 	std::string s = d.to_string(10);
 	auto t3 = std::chrono::system_clock::now();

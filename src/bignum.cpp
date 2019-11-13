@@ -4,10 +4,10 @@
 #include <cstddef>
 
 #include "bits.h"
-#include "bitvector.h"
+#include "bignum.h"
 
-using limb_t = bitvector::limb_t;
-using limb2_t = bitvector::limb2_t;
+using limb_t = bignum::limb_t;
+using limb2_t = bignum::limb2_t;
 
 
 /*--------------.
@@ -15,25 +15,25 @@ using limb2_t = bitvector::limb2_t;
 `--------------*/
 
 /*! empty constructor */
-bitvector::bitvector(const signedness s, const bitwidth bits)
+bignum::bignum(const signedness s, const bitwidth bits)
 	: limbs{0}, s(s), bits(bits) {}
 
 /*! integral constructor */
-bitvector::bitvector(const limb_t n, const signedness s, const bitwidth bits)
+bignum::bignum(const limb_t n, const signedness s, const bitwidth bits)
 	: limbs{n}, s(s), bits(bits)
 {
 	_contract();
 }
 
 /*! array constructor */
-bitvector::bitvector(const std::initializer_list<limb_t> l, const signedness s, const bitwidth bits)
+bignum::bignum(const std::initializer_list<limb_t> l, const signedness s, const bitwidth bits)
 	: limbs(l), s(s), bits(bits)
 {
 	_contract();
 }
 
 /*! string constructor */
-bitvector::bitvector(std::string str, const signedness s, const bitwidth bits)
+bignum::bignum(std::string str, const signedness s, const bitwidth bits)
 	: limbs{0}, s(s), bits(bits)
 {
 	from_string(str.c_str(), str.size(), 0);
@@ -44,7 +44,7 @@ bitvector::bitvector(std::string str, const signedness s, const bitwidth bits)
 
 
 /*! string constructor with radix */
-bitvector::bitvector(std::string str, const size_t radix, const signedness s, const bitwidth bits)
+bignum::bignum(std::string str, const size_t radix, const signedness s, const bitwidth bits)
 	: limbs{0}, s(s), bits(bits)
 {
 	from_string(str.c_str(), str.size(), radix);
@@ -54,14 +54,14 @@ bitvector::bitvector(std::string str, const size_t radix, const signedness s, co
 }
 
 /*! copy constructor  */
-bitvector::bitvector(const bitvector &operand)
+bignum::bignum(const bignum &operand)
 	: limbs(operand.limbs), s(operand.s), bits(operand.bits)
 {
 	_contract();
 }
 
 /*! move constructor  */
-bitvector::bitvector(const bitvector&& operand) noexcept
+bignum::bignum(const bignum&& operand) noexcept
 	: limbs(std::move(operand.limbs)), s(operand.s), bits(operand.bits)
 {
 	_contract();
@@ -73,7 +73,7 @@ bitvector::bitvector(const bitvector&& operand) noexcept
 `----------------------*/
 
 /*! integral copy assignment operator */
-bitvector& bitvector::operator=(const limb_t l)
+bignum& bignum::operator=(const limb_t l)
 {
 	_resize(1);
 	limbs[0] = l;
@@ -81,8 +81,8 @@ bitvector& bitvector::operator=(const limb_t l)
 	return *this;
 }
 
-/*! bitvector copy assignment operator */
-bitvector& bitvector::operator=(const bitvector &operand)
+/*! bignum copy assignment operator */
+bignum& bignum::operator=(const bignum &operand)
 {
 	limbs = operand.limbs;
 	if (bits == 0) bits = operand.bits;
@@ -90,8 +90,8 @@ bitvector& bitvector::operator=(const bitvector &operand)
 	return *this;
 }
 
-/*! bitvector move assignment operator */
-bitvector& bitvector::operator=(bitvector &&operand)
+/*! bignum move assignment operator */
+bignum& bignum::operator=(bignum &&operand)
 {
 	limbs = std::move(operand.limbs);
 	if (bits == 0) bits = operand.bits;
@@ -105,13 +105,13 @@ bitvector& bitvector::operator=(bitvector &&operand)
 `------------------*/
 
 /*! expand limbs to match operand */
-void bitvector::_expand(const bitvector &operand)
+void bignum::_expand(const bignum &operand)
 {
 	limbs.resize(std::min(max_limbs(), std::max(num_limbs(), operand.num_limbs())));
 }
 
 /*! contract zero big end limbs */
-void bitvector::_contract()
+void bignum::_contract()
 {
 	while (bits > 0 && num_limbs() > max_limbs()) {
 		limbs.pop_back();
@@ -125,7 +125,7 @@ void bitvector::_contract()
 }
 
 /*! resize number of limbs */
-void bitvector::_resize(size_t n)
+void bignum::_resize(size_t n)
 {
 	limbs.resize(n);
 }
@@ -136,16 +136,16 @@ void bitvector::_resize(size_t n)
 `-------------------------------*/
 
 /*! return number of limbs */
-size_t bitvector::num_limbs() const { return limbs.size(); }
+size_t bignum::num_limbs() const { return limbs.size(); }
 
 /*! return maximum number of limbs */
-size_t bitvector::max_limbs() const { return ((bits - 1) >> limb_shift) + 1; }
+size_t bignum::max_limbs() const { return ((bits - 1) >> limb_shift) + 1; }
 
 /*! access word at limb offset */
-limb_t bitvector::limb_at(size_t n) const { return n < num_limbs() ? limbs[n] : 0; }
+limb_t bignum::limb_at(size_t n) const { return n < num_limbs() ? limbs[n] : 0; }
 
 /*! limb_mask at limb offset */
-limb_t bitvector::limb_mask(size_t n) const
+limb_t bignum::limb_mask(size_t n) const
 {
     if (bits == 0) return -1;
     if (n < (bits >> limb_shift)) return -1;
@@ -154,7 +154,7 @@ limb_t bitvector::limb_mask(size_t n) const
 }
 
 /*! test bit at bit offset */
-int bitvector::test_bit(size_t n) const
+int bignum::test_bit(size_t n) const
 {
 	size_t word = n >> limb_shift;
 	if (word < num_limbs()) return (limbs[word] >> (n & (limb_bits-1))) & 1;
@@ -162,7 +162,7 @@ int bitvector::test_bit(size_t n) const
 }
 
 /*! set bit at bit offset */
-void bitvector::set_bit(size_t n)
+void bignum::set_bit(size_t n)
 {
 	size_t word = n >> limb_shift;
 	if (word >= num_limbs()) _resize(word + 1);
@@ -170,7 +170,7 @@ void bitvector::set_bit(size_t n)
 }
 
 /*! return number of bits */
-size_t bitvector::num_bits() const
+size_t bignum::num_bits() const
 {
 	if (bits > 0) return bits;
 	if (limbs.size() == 1 && limbs[0] == 0) return 0;
@@ -178,7 +178,7 @@ size_t bitvector::num_bits() const
 }
 
 /*! test sign */
-bool bitvector::sign_bit() const
+bool bignum::sign_bit() const
 {
 	return s.is_signed && bits > 0 ? test_bit(bits - 1) : 0;
 }
@@ -189,7 +189,7 @@ bool bitvector::sign_bit() const
 `---------------------*/
 
 /*! add with carry equals */
-bitvector& bitvector::operator+=(const bitvector &operand)
+bignum& bignum::operator+=(const bignum &operand)
 {
 	_expand(operand);
 	limb_t carry = 0;
@@ -206,7 +206,7 @@ bitvector& bitvector::operator+=(const bitvector &operand)
 }
 
 /*! subtract with borrow equals */
-bitvector& bitvector::operator-=(const bitvector &operand)
+bignum& bignum::operator-=(const bignum &operand)
 {
 	_expand(operand);
 	limb_t borrow = 0;
@@ -221,7 +221,7 @@ bitvector& bitvector::operator-=(const bitvector &operand)
 }
 
 /*! left shift equals */
-bitvector& bitvector::operator<<=(size_t shamt)
+bignum& bignum::operator<<=(size_t shamt)
 {
 	size_t limb_shamt = shamt >> limb_shift;
 	if (limb_shamt > 0) {
@@ -246,7 +246,7 @@ bitvector& bitvector::operator<<=(size_t shamt)
 }
 
 /*! right shift equals */
-bitvector& bitvector::operator>>=(size_t shamt)
+bignum& bignum::operator>>=(size_t shamt)
 {
 	size_t limb_shamt = shamt >> limb_shift;
 	if (limb_shamt > 0) {
@@ -270,7 +270,7 @@ bitvector& bitvector::operator>>=(size_t shamt)
 }
 
 /*! bitwise and equals */
-bitvector& bitvector::operator&=(const bitvector &operand)
+bignum& bignum::operator&=(const bignum &operand)
 {
 	_expand(operand);
 	for (size_t i = 0; i < num_limbs(); i++) {
@@ -281,7 +281,7 @@ bitvector& bitvector::operator&=(const bitvector &operand)
 }
 
 /*! bitwise or equals */
-bitvector& bitvector::operator|=(const bitvector &operand)
+bignum& bignum::operator|=(const bignum &operand)
 {
 	_expand(operand);
 	for (size_t i = 0; i < num_limbs(); i++) {
@@ -292,7 +292,7 @@ bitvector& bitvector::operator|=(const bitvector &operand)
 }
 
 /*! bitwise xor equals */
-bitvector& bitvector::operator^=(const bitvector &operand)
+bignum& bignum::operator^=(const bignum &operand)
 {
 	_expand(operand);
 	for (size_t i = 0; i < num_limbs(); i++) {
@@ -310,58 +310,58 @@ bitvector& bitvector::operator^=(const bitvector &operand)
 /* const operations copy and use the mutating operations */
 
 /*! add with carry */
-bitvector bitvector::operator+(const bitvector &operand) const
+bignum bignum::operator+(const bignum &operand) const
 {
-	bitvector result(*this);
+	bignum result(*this);
 	return result += operand;
 }
 
 /*! subtract with borrow */
-bitvector bitvector::operator-(const bitvector &operand) const
+bignum bignum::operator-(const bignum &operand) const
 {
-	bitvector result(*this);
+	bignum result(*this);
 	return result -= operand;
 }
 
 /*! left shift */
-bitvector bitvector::operator<<(size_t shamt) const
+bignum bignum::operator<<(size_t shamt) const
 {
-	bitvector result(*this);
+	bignum result(*this);
 	return result <<= shamt;
 }
 
 /*! right shift */
-bitvector bitvector::operator>>(size_t shamt) const
+bignum bignum::operator>>(size_t shamt) const
 {
-	bitvector result(*this);
+	bignum result(*this);
 	return result >>= shamt;
 }
 
 /*! bitwise and */
-bitvector bitvector::operator&(const bitvector &operand) const
+bignum bignum::operator&(const bignum &operand) const
 {
-	bitvector result(*this);
+	bignum result(*this);
 	return result &= operand;
 }
 
 /*! bitwise or */
-bitvector bitvector::operator|(const bitvector &operand) const
+bignum bignum::operator|(const bignum &operand) const
 {
-	bitvector result(*this);
+	bignum result(*this);
 	return result |= operand;
 }
 
 /*! bitwise xor */
-bitvector bitvector::operator^(const bitvector &operand) const
+bignum bignum::operator^(const bignum &operand) const
 {
-	bitvector result(*this);
+	bignum result(*this);
 	return result ^= operand;
 }
 
 /*! bitwise not */
-bitvector bitvector::operator~() const
+bignum bignum::operator~() const
 {
-	bitvector result(*this);
+	bignum result(*this);
 	for (auto &n : result.limbs) {
 		n = ~n;
 	}
@@ -369,9 +369,9 @@ bitvector bitvector::operator~() const
 }
 
 /*! negate */
-bitvector bitvector::operator-() const
+bignum bignum::operator-() const
 {
-	bitvector result(*this);
+	bignum result(*this);
 	if (bits == 0) {
 		return result;
 	}
@@ -393,7 +393,7 @@ bitvector bitvector::operator-() const
 /* comparison are defined in terms of "equals" and "less than" */
 
 /*! equals */
-bool bitvector::operator==(const bitvector &operand) const
+bool bignum::operator==(const bignum &operand) const
 {
 	if (num_limbs() != operand.num_limbs()) return false;
 	for (size_t i = 0; i < num_limbs(); i++) {
@@ -403,7 +403,7 @@ bool bitvector::operator==(const bitvector &operand) const
 }
 
 /*! less than */
-bool bitvector::operator<(const bitvector &operand) const
+bool bignum::operator<(const bignum &operand) const
 {
 	/* handle signed comparison if both operands are signed */
 	if (bits > 0 && s.is_signed && operand.s.is_signed) {
@@ -428,19 +428,19 @@ bool bitvector::operator<(const bitvector &operand) const
 /* axiomatically define other comparisons in terms of "equals" and "less than" */
 
 /*! not equals */
-bool bitvector::operator!=(const bitvector &operand) const { return !(*this == operand); }
+bool bignum::operator!=(const bignum &operand) const { return !(*this == operand); }
 
 /*! less than or equal*/
-bool bitvector::operator<=(const bitvector &operand) const { return *this < operand || *this == operand; }
+bool bignum::operator<=(const bignum &operand) const { return *this < operand || *this == operand; }
 
 /*! greater than */
-bool bitvector::operator>(const bitvector &operand) const { return !(*this <= operand); }
+bool bignum::operator>(const bignum &operand) const { return !(*this <= operand); }
 
 /*! less than or equal*/
-bool bitvector::operator>=(const bitvector &operand) const { return !(*this < operand) || *this == operand; }
+bool bignum::operator>=(const bignum &operand) const { return !(*this < operand) || *this == operand; }
 
 /*! not */
-bool bitvector::operator!() const { return *this == 0; }
+bool bignum::operator!() const { return *this == 0; }
 
 
 /*--------------------.
@@ -450,7 +450,7 @@ bool bitvector::operator!() const { return *this == 0; }
 /* These routines are derived from Hacker's Delight */
 
 /*! base 2^limb_bits multiply */
-void bitvector::mult(const bitvector &multiplicand, const bitvector multiplier, bitvector &result)
+void bignum::mult(const bignum &multiplicand, const bignum multiplier, bignum &result)
 {
 	size_t m = multiplicand.num_limbs(), n = multiplier.num_limbs();
 	size_t k = std::min(multiplicand.max_limbs(), m + n);
@@ -481,7 +481,7 @@ void bitvector::mult(const bitvector &multiplicand, const bitvector multiplier, 
 }
 
 /*! base 2^limb_bits division */
-void bitvector::divrem(const bitvector &dividend, const bitvector &divisor, bitvector &quotient, bitvector &remainder)
+void bignum::divrem(const bignum &dividend, const bignum &divisor, bignum &quotient, bignum &remainder)
 {
 	quotient = 0;
 	remainder = 0;
@@ -578,50 +578,50 @@ void bitvector::divrem(const bitvector &dividend, const bitvector &divisor, bitv
 }
 
 /*! multiply */
-bitvector bitvector::operator*(const bitvector &operand) const
+bignum bignum::operator*(const bignum &operand) const
 {
-	bitvector result(0, s, bits);
+	bignum result(0, s, bits);
 	mult(*this, operand, result);
 	result._contract();
 	return result;
 }
 
 /*! division quotient */
-bitvector bitvector::operator/(const bitvector &divisor) const
+bignum bignum::operator/(const bignum &divisor) const
 {
-	bitvector quotient(0, s, bits), remainder(0, s, bits);
+	bignum quotient(0, s, bits), remainder(0, s, bits);
 	divrem(*this, divisor, quotient, remainder);
 	return quotient;
 }
 
 /*! division remainder */
-bitvector bitvector::operator%(const bitvector &divisor) const
+bignum bignum::operator%(const bignum &divisor) const
 {
-	bitvector quotient(0), remainder(0);
+	bignum quotient(0), remainder(0);
 	divrem(*this, divisor, quotient, remainder);
 	return remainder;
 }
 
 /*! multiply equals */
-bitvector& bitvector::operator*=(const bitvector &operand)
+bignum& bignum::operator*=(const bignum &operand)
 {
-	bitvector result = *this * operand;
+	bignum result = *this * operand;
 	*this = std::move(result);
 	return *this;
 }
 
 /*! divide equals */
-bitvector& bitvector::operator/=(const bitvector &operand)
+bignum& bignum::operator/=(const bignum &operand)
 {
-	bitvector result = *this / operand;
+	bignum result = *this / operand;
 	*this = std::move(result);
 	return *this;
 }
 
 /*! modulus equals */
-bitvector& bitvector::operator%=(const bitvector &operand)
+bignum& bignum::operator%=(const bignum &operand)
 {
-	bitvector result = *this % operand;
+	bignum result = *this % operand;
 	*this = std::move(result);
 	return *this;
 }
@@ -632,10 +632,10 @@ bitvector& bitvector::operator%=(const bitvector &operand)
 `--------------------*/
 
 /*! raise to the power */
-bitvector bitvector::pow(size_t exp) const
+bignum bignum::pow(size_t exp) const
 {
 	if (exp == 0) return 1;
-	bitvector x = *this, y = 1;
+	bignum x = *this, y = 1;
 	while (exp > 1) {
 		if ((exp & 1) == 0) {
 			exp >>= 1;
@@ -654,9 +654,9 @@ bitvector bitvector::pow(size_t exp) const
 `-------------------*/
 
 /*! helper for recursive divide and conquer conversion to string */
-static inline ptrdiff_t _to_string_c(const bitvector &val, std::string &s, ptrdiff_t offset)
+static inline ptrdiff_t _to_string_c(const bignum &val, std::string &s, ptrdiff_t offset)
 {
-	limb2_t v = limb2_t(val.limb_at(0)) | (limb2_t(val.limb_at(1)) << bitvector::limb_bits);
+	limb2_t v = limb2_t(val.limb_at(0)) | (limb2_t(val.limb_at(1)) << bignum::limb_bits);
 	do {
 		s[--offset] = '0' + char(v % 10);
 	} while ((v /= 10) != 0);
@@ -664,11 +664,11 @@ static inline ptrdiff_t _to_string_c(const bitvector &val, std::string &s, ptrdi
 }
 
 /*! helper for recursive divide and conquer conversion to string */
-static ptrdiff_t _to_string_r(const bitvector &val, std::vector<bitvector> &sq, size_t level,
+static ptrdiff_t _to_string_r(const bignum &val, std::vector<bignum> &sq, size_t level,
 	std::string &s, size_t digits, ptrdiff_t offset)
 {
-	bitvector q, r;
-	bitvector::divrem(val, sq[level], q, r);
+	bignum q, r;
+	bignum::divrem(val, sq[level], q, r);
 	if (level > 0) {
 		if (r != 0) {
 			if (q != 0) {
@@ -691,11 +691,11 @@ static ptrdiff_t _to_string_r(const bitvector &val, std::vector<bitvector> &sq, 
 	return offset;
 }
 
-/*! convert from bitvector to string */
-std::string bitvector::to_string(size_t radix) const
+/*! convert from bignum to string */
+std::string bignum::to_string(size_t radix) const
 {
 	static const char* hexdigits = "0123456789abcdef";
-	static const bitvector tenp18{0xa7640000, 0xde0b6b3};
+	static const bignum tenp18{0xa7640000, 0xde0b6b3};
 	static const size_t dgib = 3566893131; /* log2(10) * 1024^3 */
 
 	switch (radix) {
@@ -708,9 +708,9 @@ std::string bitvector::to_string(size_t radix) const
 			s.resize(climit, '0');
 
 			/* square the chunk size until ~= sqrt(n) */
-			bitvector chunk = tenp18;
+			bignum chunk = tenp18;
 			size_t digits = 18;
-			std::vector<bitvector> sq = { tenp18 };
+			std::vector<bignum> sq = { tenp18 };
 			do {
 				chunk *= chunk;
 				digits <<= 1;
@@ -769,11 +769,11 @@ std::string bitvector::to_string(size_t radix) const
 	}
 }
 
-/*! convert to bitvector from string */
-void bitvector::from_string(const char *str, size_t len, size_t radix)
+/*! convert to bignum from string */
+void bignum::from_string(const char *str, size_t len, size_t radix)
 {
-	static const bitvector tenp18{0xa7640000, 0xde0b6b3};
-	static const bitvector twop64{0,0,1};
+	static const bignum tenp18{0xa7640000, 0xde0b6b3};
+	static const bignum twop64{0,0,1};
 	if (len > 2) {
 		if (strncmp(str, "0b", 2) == 0) {
 			radix = 2;
@@ -797,9 +797,9 @@ void bitvector::from_string(const char *str, size_t len, size_t radix)
 				if (chunklen == 18) {
 					*this *= tenp18;
 				} else {
-					*this *= bitvector(10).pow(chunklen);
+					*this *= bignum(10).pow(chunklen);
 				}
-				*this += bitvector{limb_t(num), limb_t(num >> limb_bits)};
+				*this += bignum{limb_t(num), limb_t(num >> limb_bits)};
 			}
 			break;
 		}
@@ -811,9 +811,9 @@ void bitvector::from_string(const char *str, size_t len, size_t radix)
 				if (chunklen == 64) {
 					*this *= twop64;
 				} else {
-					*this *= bitvector(2).pow(chunklen);
+					*this *= bignum(2).pow(chunklen);
 				}
-				*this += bitvector{limb_t(num), limb_t(num >> limb_bits)};
+				*this += bignum{limb_t(num), limb_t(num >> limb_bits)};
 			}
 			break;
 		}
@@ -825,9 +825,9 @@ void bitvector::from_string(const char *str, size_t len, size_t radix)
 				if (chunklen == 16) {
 					*this *= twop64;
 				} else {
-					*this *= bitvector(16).pow(chunklen);
+					*this *= bignum(16).pow(chunklen);
 				}
-				*this += bitvector{limb_t(num), limb_t(num >> limb_bits)};
+				*this += bignum{limb_t(num), limb_t(num >> limb_bits)};
 			}
 			break;
 		}

@@ -1,4 +1,4 @@
-Copyright (C) 2017, Michael Clark <mjc@sifive.com>
+Copyright (C) 2017, Michael Clark <michaeljclark@mac.com>
 Copyright (C) 2018, SiFive, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a

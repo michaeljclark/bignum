@@ -9,7 +9,29 @@ C++ bignum with support for arbitrary precision integer arithmetic.
 - multiplication and division algorithm from Hacker's Delight.
 - divide and conquer algorithm for radix 10 conversion to string.
 
-### Example code for C++ bignum arithmetic:
+## Build
+
+The bignum library standard build process uses _cmake_.
+
+#### GCC or Clang on Linux or macOS
+
+```
+mkdir build
+cd build
+cmake -G "Unix Makefiles" ..
+```
+
+#### Microsoft Visual Studio 2019 on Windows
+
+```
+mkdir build
+cd build
+cmake -G "Visual Studio 16 2019" ..
+```
+
+## Examples
+
+#### Example code for C++ bignum arithmetic
 
 ```
 #include <iostream>
@@ -24,7 +46,7 @@ int main()
 }
 ```
 
-### Equivalent code using GMP (GNU Multiple Precision Arithmetic Library):
+#### Equivalent code using GMP (GNU Multiple Precision Arithmetic Library)
 
 ```
 #include <iostream>

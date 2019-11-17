@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.0.2)
 
 project(bignum)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 include(CheckCXXCompilerFlag)
 
 find_library(GMP_LIBRARY gmp)

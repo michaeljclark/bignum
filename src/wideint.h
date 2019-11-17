@@ -26,6 +26,7 @@ struct wideint
         lc = (bits + lb - 1) >> ll2,
 
         num_bits = nb,
+        num_bytes = nb>>3,
         limb_bits = lb,
         limb_count = lc
     };
@@ -195,7 +196,7 @@ struct wideint
                 limbs[i] = (n >> shamt | m << (-shamt & lsm));
                 n = m;
             }
-            limbs[i] = (n >> shamt | -s << (shamt-1));
+            limbs[i] = (n >> shamt | -s << (nb-shamt-1));
         }
         for (size_t i = lc-ls; i < lc; i++) {
             limbs[i] = -s;

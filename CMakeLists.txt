@@ -7,7 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(CheckCXXCompilerFlag)
 
+find_path(GMP_INCLUDE_DIR gmp.h
+    PATHS ${GMP_PREFIX}/include /usr/include /usr/local/include )
 find_library(GMP_LIBRARY gmp)
+if(GMP_INCLUDE_DIR)
+include_directories(${GMP_INCLUDE_DIR})
+endif()
 
 # We need haswell for TZCNT/LZCNT
 check_cxx_compiler_flag("-march=haswell" has_march_haswell "int main() { return 0; }")

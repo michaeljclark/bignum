@@ -14,19 +14,15 @@ endif()
 
 include_directories(src)
 
-add_library(bignum src/bignum.cpp)
+add_library(bignum src/bignum.cc)
 
 enable_testing()
 
-add_executable(test_1 tests/test_1.cpp)
-target_link_libraries(test_1 bignum)
-add_test(TEST_1 test_1)
-
-add_executable(test_2 tests/test_2.cpp)
-target_link_libraries(test_2 bignum)
-add_test(TEST_2 test_2)
+add_executable(test_bignum tests/test_bignum.cc)
+target_link_libraries(test_bignum bignum)
+add_test(TEST_BIGNUM test_bignum)
 
 if(GMP_LIBRARY)
-add_executable(bench_1 tests/bench_1.cpp)
-target_link_libraries(bench_1 bignum ${GMP_LIBRARY})
+add_executable(bench_bignum tests/bench_bignum.cc)
+target_link_libraries(bench_bignum bignum ${GMP_LIBRARY})
 endif()

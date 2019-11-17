@@ -3,7 +3,6 @@
 #include <cassert>
 #include <cstddef>
 
-#include "bits.h"
 #include "bignum.h"
 
 using limb_t = bignum::limb_t;
@@ -549,7 +548,7 @@ void bignum::divrem(const bignum &dividend, const bignum &divisor, bignum &quoti
 		}
 		// Multiply and subtract.
 		limb2_t k = 0;
-		integer<limb_bits*2, true>::type t = 0;
+		hostint<limb_bits*2, true>::type t = 0;
 		for (ptrdiff_t i = 0; i < n; i++) {
 			unsigned long long p = qhat*vn[i];
 			t = un[i+j] - k - (p & ((1ULL<<limb_bits)-1));

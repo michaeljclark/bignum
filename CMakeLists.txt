@@ -22,6 +22,10 @@ add_executable(test_bignum tests/test_bignum.cc)
 target_link_libraries(test_bignum bignum)
 add_test(TEST_BIGNUM test_bignum)
 
+add_executable(test_wideint tests/test_wideint.cc)
+target_link_libraries(test_wideint bignum)
+add_test(TEST_WIDEINT test_wideint)
+
 if(GMP_LIBRARY)
 add_executable(bench_bignum tests/bench_bignum.cc)
 target_link_libraries(bench_bignum bignum ${GMP_LIBRARY})

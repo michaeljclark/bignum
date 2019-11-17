@@ -15,10 +15,10 @@ include_directories(${GMP_INCLUDE_DIR})
 endif()
 
 # We need haswell for TZCNT/LZCNT
-check_cxx_compiler_flag("-march=haswell" has_march_haswell "int main() { return 0; }")
-if (has_march_haswell)
-	list(APPEND CMAKE_CXX_FLAGS -march=haswell)
-endif()
+#check_cxx_compiler_flag("-march=haswell" has_march_haswell "int main() { return 0; }")
+#if (has_march_haswell)
+#	list(APPEND CMAKE_CXX_FLAGS -march=haswell)
+#endif()
 
 include_directories(src)
 

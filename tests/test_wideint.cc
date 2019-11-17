@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <cinttypes>
 
 #include "wideint.h"
 
@@ -27,7 +28,7 @@ template <typename T> void print(const char *fmt, T num)
         if (i != T::limb_count-1) {
             p += snprintf(p, end-p, ", ");
         }
-        p += snprintf(p, end-p, "0x%016lx", num.limbs[i]);
+        p += snprintf(p, end-p, "0x%016" PRIx64, num.limbs[i]);
     }
     *p = 0;
 

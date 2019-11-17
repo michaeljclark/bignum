@@ -2,7 +2,8 @@
 
 C++ bignum with support for arbitrary precision integer arithmetic.
 
-- bit vector with bignum support using 32-bit limbs.
+- wideint arbitrary fixed width signed two's complement or unsigned integer.
+- bignum arbitrary variable width signed two's complement or unsigned integer.
 - supports static or dynamic width.
 - supports arbitrary precision signed and unsigned arithmetic.
 - supports operator overloads for C++ math, logical and bitwise operators.
@@ -30,6 +31,21 @@ cmake -G "Visual Studio 16 2019" ..
 ```
 
 ## Examples
+
+#### Example wideint arithmetic
+
+```
+#include <wideint.h>
+
+typedef wideint<256> int256_t;
+
+int main()
+{
+
+	int256_t a = 2;
+	int256_t b = a | 3;
+}
+```
 
 #### Example code for C++ bignum arithmetic
 

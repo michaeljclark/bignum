@@ -79,6 +79,10 @@ void test_wideint()
     ASSERT_EQ_256(c,0xffffffffffffffffull,0xffffffffffffffffull,0xffffffffffffffffull,0xffff00ff00ff0000ull);
     int256_t d = b >> 208;
     ASSERT_EQ_256(d,0xffffffffffffffffull,0xffffffffffffffffull,0xffffffffffffffffull,0xffffffff00ff00ffull);
+    uint256_t e = uint256_t(b) >> 208;
+    ASSERT_EQ_256(e,0x0000000000000000ull,0x0000000000000000ull,0x0000000000000000ull,0x0000ffff00ff00ffull);
+    uint256_t f = b ; f >>= 208;
+    ASSERT_EQ_256(f,0x0000000000000000ull,0x0000000000000000ull,0x0000000000000000ull,0x0000ffff00ff00ffull);
 
     for (size_t i = 0; i < int256_t::num_bytes; i++) {
         b <<= 8;

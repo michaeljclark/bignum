@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <array>
 
 #include "bits.h"
@@ -59,11 +60,9 @@ struct wideint
         }
     }
 
-    /*! copy constructor */
-    inline wideint(const wideint<bits,is_signed> &operand) = default;
-
-    /*! move constructor */
-    inline wideint(wideint<bits,is_signed>&& operand) = default;
+    /*! copy constructors */
+    inline wideint(const wideint<bits,false> &o) : limbs(o.limbs) {};
+    inline wideint(const wideint<bits,true> &o) : limbs(o.limbs) {};
 
 
     /*----------------------.
@@ -80,10 +79,8 @@ struct wideint
     }
 
     /*! wideint copy assignment operator */
-    inline wideint& operator=(const wideint<bits,is_signed> &operand) = default;
-
-    /*! wideint move assignment operator */
-    inline wideint& operator=(wideint<bits,is_signed> &&operand) = default;
+    inline wideint& operator=(const wideint<bits,false> &o) { std::memcpy(limbs,o.limbs,sizeof(limbs)); }
+    inline wideint& operator=(const wideint<bits,true> &o) { std::memcpy(limbs,o.limbs,sizeof(limbs)); }
 
 
     /*-------------------------------.

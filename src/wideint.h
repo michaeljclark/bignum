@@ -6,6 +6,7 @@
 #include <array>
 
 #include "bits.h"
+#include "hostint.h"
 
 /*------------------.
 | wideint.          |
@@ -22,7 +23,7 @@ struct wideint
     enum {
         nb = bits,
         lb = sizeof(void*)<<3,
-        ll2 = hostint_traits<lb>::type::log2,
+        ll2 = int_t<lb>::traits::log2,
         lsm = ((1 << ll2)-1),
         lc = (bits + lb - 1) >> ll2,
 

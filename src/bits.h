@@ -4,54 +4,6 @@
 
 #include  <cstddef>
 #include  <cstdint>
-#include  <type_traits>
-
-template<size_t _size, bool _signed = true>
-struct hostint {
-	typedef typename std::conditional<
-		_size == 8,
-		typename std::conditional<_signed, int8_t, uint8_t>::type,
-		typename std::conditional<
-			_size == 16,
-			typename std::conditional<_signed, int16_t, uint16_t>::type,
-			typename std::conditional<
-				_size == 32,
-				typename std::conditional<_signed, int32_t, uint32_t>::type,
-				typename std::conditional<
-					_size == 64,
-					typename std::conditional<_signed, int64_t, uint64_t>::type,
-					void
-				>::type
-			>::type
-		>::type
-	>::type type;
-};
-
-struct int8_traits { enum { size = 8, log2 = 3 }; };
-struct int16_traits { enum { size = 16, log2 = 4 }; };
-struct int32_traits { enum { size = 32, log2 = 5 }; };
-struct int64_traits { enum { size = 64, log2 = 6 }; };
-
-template<size_t _size>
-struct hostint_traits {
-	typedef typename std::conditional<
-		_size == 8,
-		int8_traits,
-		typename std::conditional<
-			_size == 16,
-			int16_traits,
-			typename std::conditional<
-				_size == 32,
-				int32_traits,
-				typename std::conditional<
-					_size == 64,
-					int64_traits,
-					void
-				>::type
-			>::type
-		>::type
-	>::type type;
-};
 
 #if defined (_MSC_VER)
 #include <intrin.h>

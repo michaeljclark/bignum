@@ -13,6 +13,7 @@
 #include <initializer_list> 
 
 #include "bits.h"
+#include "hostint.h"
 
 /*------------------.
 | signedness.       |

@@ -26,6 +26,8 @@ struct wideint
         lsm = ((1 << ll2)-1),
         lc = (bits + lb - 1) >> ll2,
 
+        is_pow2 = ((nb & -nb) == nb),
+
         num_bits = nb,
         num_bytes = nb>>3,
         limb_bits = lb,
@@ -148,9 +150,10 @@ struct wideint
     }
 
     /*! left shift equals */
-    wideint& op_shl(size_t shamt)
+    wideint& op_shl(int shamt)
     {
-        shamt %= nb;
+        shamt = is_pow2 ? shamt & (nb-1) /* -shift -> mod width */
+                        : shamt < 0 ? nb - shamt : shamt % nb;
         ptrdiff_t ls = shamt >> ll2;
         shamt -= ls << ll2;
         if (shamt == 0) {
@@ -175,9 +178,10 @@ struct wideint
     }
 
     /*! right shift equals */
-    wideint& op_shr(size_t shamt)
+    wideint& op_shr(int shamt)
     {
-        shamt %= nb;
+        shamt = is_pow2 ? shamt & (nb-1) /* -shift -> mod width */
+                        : shamt < 0 ? nb - shamt : shamt % nb;
         size_t ls = shamt >> ll2;
         shamt -= ls << ll2;
         limb_t s = is_signed && sign_bit();
@@ -295,15 +299,15 @@ struct wideint
 
     wideint& operator+=(const wideint &operand) { return this->op_add(operand); }
     wideint& operator-=(const wideint &operand) { return this->op_sub(operand); }
-    wideint& operator<<=(size_t shamt) { return this->op_shl(shamt); }
-    wideint& operator>>=(size_t shamt) { return this->op_shr(shamt); }
+    wideint& operator<<=(int shamt) { return this->op_shl(shamt); }
+    wideint& operator>>=(int shamt) { return this->op_shr(shamt); }
     wideint& operator&=(const wideint &operand) { return this->op_and(operand); }
     wideint& operator|=(const wideint &operand) { return this->op_or(operand); }
     wideint& operator^=(const wideint &operand) { return this->op_xor(operand); }
     wideint operator+(const wideint &operand) const { return value_type(*this).op_add(operand); }
     wideint operator-(const wideint &operand) const { return value_type(*this).op_sub(operand); }
-    wideint operator<<(size_t shamt) const { return value_type(*this).op_shl(shamt); }
-    wideint operator>>(size_t shamt) const { return value_type(*this).op_shr(shamt); }
+    wideint operator<<(int shamt) const { return value_type(*this).op_shl(shamt); }
+    wideint operator>>(int shamt) const { return value_type(*this).op_shr(shamt); }
     wideint operator&(const wideint &operand) const { return value_type(*this).op_and(operand); }
     wideint operator|(const wideint &operand) const { return value_type(*this).op_or(operand); }
     wideint operator^(const wideint &operand) const { return value_type(*this).op_xor(operand); }

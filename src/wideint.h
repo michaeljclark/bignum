@@ -36,6 +36,7 @@ struct wideint
 
     /*! limb type */
     typedef typename hostint<lb, false>::type limb_t;
+    typedef typename hostint<lb, true>::type slimb_t;
     typedef typename hostint<lb*2, false>::type limb2_t;
     typedef wideint<bits,is_signed> value_type;
 
@@ -197,7 +198,9 @@ struct wideint
                 limbs[i] = (n >> shamt | m << (-shamt & lsm));
                 n = m;
             }
-            limbs[i] = (n >> shamt | -s << (nb-shamt-1));
+            /* arithmetic shift if signed and this word is the last word */
+            limb_t lw = s && (i == lc-1) ? slimb_t(n) >> shamt : n >> shamt;
+            limbs[i] = lw | -s << ((nb-shamt-1) & lsm);
         }
         for (size_t i = lc-ls; i < lc; i++) {
             limbs[i] = -s;

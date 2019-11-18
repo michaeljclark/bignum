@@ -102,14 +102,14 @@ struct wideint
     int test_bit(size_t n) const
     {
         size_t word = n >> ll2;
-        return (limbs[word] >> (n & (lb-1))) & 1;
+        return (limbs[word] >> (n & lsm)) & 1;
     }
 
     /*! set bit at bit offset */
     void set_bit(size_t n)
     {
         size_t word = n >> ll2;
-        limbs[word] |= (1ULL << (n & (lb-1))) & limb_mask(word);
+        limbs[word] |= (1ULL << (n & lsm)) & limb_mask(word);
     }
 
     /*! test sign */

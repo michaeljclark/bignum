@@ -66,6 +66,7 @@ struct bignum
 	/*! limb type */
 	typedef hostint<limb_bits, false>::type ulimb_t;
 	typedef hostint<limb_bits*2, false>::type udlimb_t;
+	typedef hostint<limb_bits*2, true>::type sdlimb_t;
 
 	/*------------------.
 	| member variables. |

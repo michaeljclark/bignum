@@ -5,6 +5,7 @@
 #include <cinttypes>
 
 #include "wideint.h"
+#include "bignum.h"
 
 typedef wideint<48>            int48_t;
 typedef wideint<128>          int128_t;
@@ -12,7 +13,26 @@ typedef wideint<128,false>   uint128_t;
 typedef wideint<256>          int256_t;
 typedef wideint<256,false>   uint256_t;
 
-template <typename T> void print(const char *fmt, T num)
+template <typename T> void printb(const char *fmt, T num)
+{
+    const size_t lc = num.num_limbs();
+    const size_t hex_digits = 8;
+    const size_t len = lc * (hex_digits + 4);
+
+    char *buf = (char*)alloca(len);
+    char *p = buf, *end = buf + len;
+    for (ptrdiff_t i = lc-1; i >= 0; i--) {
+        if (i != lc-1) {
+            p += snprintf(p, end-p, ", ");
+        }
+        p += snprintf(p, end-p, "0x%08" PRIx32, num.limbs[i]);
+    }
+    *p = 0;
+
+    printf(fmt, buf);
+}
+
+template <typename T> void printw(const char *fmt, T num)
 {
     const size_t hex_digits = T::limb_bits >> 2;
     const size_t len = T::limb_count * (hex_digits + 4);
@@ -31,7 +51,8 @@ template <typename T> void print(const char *fmt, T num)
 }
 
 #define STR(x) #x
-#define DUMP(x) print(STR(x) " = { %s }\n", x);
+#define DUMP(x) printw(STR(x) " = { %s }\n", x);
+#define DUMPB(x) printb(STR(x) " = { %s }\n", x);
 
 template <typename T> void test_i256()
 {
@@ -99,10 +120,56 @@ void test_wideint()
     ASSERT_EQ_256(h,0x0000000000000000ull,0x0000000000000000ull,0x0000000000000000ull,0x0000060504030201ull);
     g = d;
     ASSERT_EQ_48(g, 0x0000ffff00ff00ffull);
+}
 
+void test_multiply()
+{
+    /* bignum multiplication */
+    bignum b12 = bignum(2147483648) * bignum(2147483648);
+    DUMPB(b12);
+    bignum b13 = b12 * b12;
+    DUMPB(b13);
+    bignum b14 = bignum(2147483647) * bignum(2147483647);
+    DUMPB(b14);
+    bignum b15 = b14 * b14;
+    DUMPB(b15);
+    bignum b16 = b15 * b15;
+    DUMPB(b16);
+
+    /* wideint multiplication */
+    uint256_t w12 = uint256_t(2147483648) * uint256_t(2147483648);
+    DUMP(w12);
+    uint256_t w13 = w12 * w12;
+    DUMP(w13);
+    uint256_t w14 = uint256_t(2147483647) * uint256_t(2147483647);
+    DUMP(w14);
+    uint256_t w15 = w14 * w14;
+    DUMP(w15);
+    uint256_t w16 = w15 * w15;
+    DUMP(w16);
+
+    /* compare strings */
+    assert(b12.to_string() == w12.to_string());
+    assert(b13.to_string() == w13.to_string());
+    assert(b14.to_string() == w14.to_string());
+    assert(b15.to_string() == w15.to_string());
+    assert(b16.to_string() == w16.to_string());
+
+    /* print decimal strings */
+    printf("b12 = %s\n", b12.to_string().c_str());
+    printf("w12 = %s\n", w12.to_string().c_str());
+    printf("b13 = %s\n", b13.to_string().c_str());
+    printf("w13 = %s\n", w13.to_string().c_str());
+    printf("b14 = %s\n", b14.to_string().c_str());
+    printf("w14 = %s\n", w14.to_string().c_str());
+    printf("b15 = %s\n", b15.to_string().c_str());
+    printf("w15 = %s\n", w15.to_string().c_str());
+    printf("b16 = %s\n", b16.to_string().c_str());
+    printf("w16 = %s\n", w16.to_string().c_str());
 }
 
 int main(int argc, char const *argv[])
 {
     test_wideint();
+    test_multiply();
 }

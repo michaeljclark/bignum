@@ -34,7 +34,7 @@ struct int64_traits { enum { log2 = 6 }; };
 struct int128_traits { enum { log2 = 7 }; };
 struct int256_traits { enum { log2 = 8 }; };
 
-template <size_t bits, bool is_signed>
+template <size_t bits, bool is_signed, size_t limb_bits_param>
 struct wideint;
 
 /*!
@@ -51,7 +51,7 @@ struct int_t {
 				typename std::conditional<_signed, int32_t, uint32_t>::type,
 				typename std::conditional<_size == 64,
 					typename std::conditional<_signed, int64_t, uint64_t>::type,
-					wideint<_size,_signed>
+					wideint<_size,_signed,64>
 				>::type
 			>::type
 		>::type

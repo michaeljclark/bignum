@@ -1,3 +1,5 @@
+// See LICENSE.md
+
 #pragma once
 
 #include <cstddef>

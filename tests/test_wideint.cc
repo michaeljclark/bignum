@@ -36,8 +36,8 @@ template <typename T> void print(const char *fmt, T num)
 template <typename T> void test_i256()
 {
     assert(sizeof(T) == 32);
-    assert(sizeof(typename T::limb_t) == sizeof(void*));
-    assert(T::limb_count == sizeof(T)/sizeof(typename T::limb_t));
+    assert(sizeof(typename T::ulimb_t) == sizeof(void*));
+    assert(T::limb_count == sizeof(T)/sizeof(typename T::ulimb_t));
 }
 
 #define ASSERT_EQ_256(v,a,b,c,d) \

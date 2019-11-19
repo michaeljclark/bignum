@@ -29,10 +29,10 @@ void test_bignum()
 	assert(b4.limb_at(0) == 2);
 
 	/* test left shift carry overflow */
-	bignum b5(std::numeric_limits<bignum::limb_t>::max());
+	bignum b5(std::numeric_limits<bignum::ulimb_t>::max());
 	b5 = b5 << 10;
 	assert(b5.num_limbs() == 2);
-	assert(b5.limb_at(0) == std::numeric_limits<bignum::limb_t>::max() - 1023);
+	assert(b5.limb_at(0) == std::numeric_limits<bignum::ulimb_t>::max() - 1023);
 	assert(b5.limb_at(1) == 1023);
 
 	/* test big left shift */
@@ -121,8 +121,8 @@ void test_bignum()
 	assert((bignum{1,1,1} + bignum{1,1,1} == bignum{2,2,2}));
 
 	/* test addition with carry */
-	bignum b9{0,std::numeric_limits<bignum::limb_t>::max()};
-	bignum b10{0,std::numeric_limits<bignum::limb_t>::max()-1,1};
+	bignum b9{0,std::numeric_limits<bignum::ulimb_t>::max()};
+	bignum b10{0,std::numeric_limits<bignum::ulimb_t>::max()-1,1};
 	assert(b9 + b9 == b10);
 
 	/* test multiplication */
@@ -152,7 +152,7 @@ void test_bignum()
 
 	/* test subtraction with borrow */
 	bignum b17{1,1};
-	bignum b18{std::numeric_limits<bignum::limb_t>::max()};
+	bignum b18{std::numeric_limits<bignum::ulimb_t>::max()};
 	assert(b17-b18 == 2);
 
 	/* test division */

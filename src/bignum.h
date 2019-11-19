@@ -64,15 +64,15 @@ struct bignum
 	};
 
 	/*! limb type */
-	typedef hostint<limb_bits, false>::type limb_t;
-	typedef hostint<limb_bits*2, false>::type limb2_t;
+	typedef hostint<limb_bits, false>::type ulimb_t;
+	typedef hostint<limb_bits*2, false>::type udlimb_t;
 
 	/*------------------.
 	| member variables. |
 	`------------------*/
 
 	/* limbs is a vector of words with the little end at offset 0 */
-	std::vector<limb_t> limbs;
+	std::vector<ulimb_t> limbs;
 
 	/*! flags indicating unsigned or signed two's complement */
 	signedness s;
@@ -89,10 +89,10 @@ struct bignum
 	bignum(const signedness s = is_unsigned(), const bitwidth bits = 0);
 
 	/*! integral constructor */
-	bignum(const limb_t n, const signedness s = is_unsigned(), const bitwidth bits = 0);
+	bignum(const ulimb_t n, const signedness s = is_unsigned(), const bitwidth bits = 0);
 
 	/*! array constructor */
-	bignum(const std::initializer_list<limb_t> l, const signedness s =  is_unsigned(), const bitwidth bits = 0);
+	bignum(const std::initializer_list<ulimb_t> l, const signedness s =  is_unsigned(), const bitwidth bits = 0);
 
 	/*! string constructor */
 	bignum(std::string str, const signedness s =  is_unsigned(), const bitwidth bits = 0);
@@ -112,7 +112,7 @@ struct bignum
 	`----------------------*/
 
 	/*! integral copy assignment operator */
-	bignum& operator=(const limb_t l);
+	bignum& operator=(const ulimb_t l);
 
 	/*! bignum copy assignment operator */
 	bignum& operator=(const bignum &operand);
@@ -146,10 +146,10 @@ struct bignum
 	size_t max_limbs() const;
 
 	/*! access word at limb offset */
-	limb_t limb_at(size_t n) const;
+	ulimb_t limb_at(size_t n) const;
 
 	/*! limb_mask at limb offset */
-	limb_t limb_mask(size_t n) const;
+	ulimb_t limb_mask(size_t n) const;
 
 	/*! test bit at bit offset */
 	int test_bit(size_t n) const;
@@ -295,8 +295,8 @@ struct inttype
 {
 	bignum v;
 	inttype() = delete;
-	inttype(const bignum::limb_t n, const signedness s, const bitwidth b) : v(n, s, b) {}
-	inttype(const std::initializer_list<bignum::limb_t> l, const signedness s, const bitwidth b) : v(l, s, b) {}
+	inttype(const bignum::ulimb_t n, const signedness s, const bitwidth b) : v(n, s, b) {}
+	inttype(const std::initializer_list<bignum::ulimb_t> l, const signedness s, const bitwidth b) : v(l, s, b) {}
 	operator const bignum& () const { return v; }
 	inttype& operator = (const inttype &) = default; 
 };

@@ -35,10 +35,9 @@ struct wideint
         limb_count = lc
     };
 
-    /*! limb type */
-    typedef typename hostint<lb, false>::type limb_t;
+    /*! limb types */
+    typedef typename hostint<lb, false>::type ulimb_t;
     typedef typename hostint<lb, true>::type slimb_t;
-    typedef typename hostint<lb*2, false>::type limb2_t;
     typedef wideint<bits,is_signed> value_type;
 
     /*------------------.
@@ -46,7 +45,7 @@ struct wideint
     `------------------*/
 
     /* limbs is an array of words with the little end at offset 0 */
-    std::array<limb_t,lc> limbs;
+    std::array<ulimb_t,lc> limbs;
 
 
     /*--------------.
@@ -57,7 +56,7 @@ struct wideint
     inline wideint() : limbs{0} {}
 
     /*! integral constructor */
-    inline wideint(const limb_t n) {
+    inline wideint(const ulimb_t n) {
         limbs[0] = n & limb_mask(0);
         for(size_t i = 1; i < lc; i++) {
             limbs[i] = 0;
@@ -74,7 +73,7 @@ struct wideint
     `----------------------*/
 
     /*! integral copy assignment operator */
-    inline wideint& operator=(const limb_t n) {
+    inline wideint& operator=(const ulimb_t n) {
         limbs[0] = n & limb_mask(0);
         for(size_t i = 1; i < lc; i++) {
             limbs[i] = 0;
@@ -92,12 +91,12 @@ struct wideint
     `-------------------------------*/
 
     /*! limb_mask at limb offset */
-    constexpr limb_t limb_mask(size_t n) const
+    constexpr ulimb_t limb_mask(size_t n) const
     {
         if ((bits & ((1<<ll2)-1)) == 0) return -1;
         if (n < lc-1) return -1;
         if (n > lc-1) return 0;
-        return (limb_t(1) << (bits & ((1<<ll2)-1))) - 1;
+        return (ulimb_t(1) << (bits & ((1<<ll2)-1))) - 1;
     }
 
     /*! test bit at bit offset */
@@ -128,10 +127,10 @@ struct wideint
     /*! add with carry equals */
     wideint& op_add(const wideint &operand)
     {
-        limb_t carry = 0;
+        ulimb_t carry = 0;
         for (size_t i = 0; i < lc; i++) {
-            limb_t old_val = limbs[i];
-            limb_t new_val = old_val + operand.limbs[i] + carry;
+            ulimb_t old_val = limbs[i];
+            ulimb_t new_val = old_val + operand.limbs[i] + carry;
             limbs[i] = new_val & limb_mask(i);
             carry = new_val < old_val;
         }
@@ -141,10 +140,10 @@ struct wideint
     /*! subtract with borrow equals */
     wideint& op_sub(const wideint &operand)
     {
-        limb_t borrow = 0;
+        ulimb_t borrow = 0;
         for (size_t i = 0; i < lc; i++) {
-            limb_t old_val = limbs[i];
-            limb_t new_val = old_val - operand.limbs[i] - borrow;
+            ulimb_t old_val = limbs[i];
+            ulimb_t new_val = old_val - operand.limbs[i] - borrow;
             limbs[i] = new_val & limb_mask(i);
             borrow = new_val > old_val;
         }
@@ -164,9 +163,9 @@ struct wideint
             }
         } else {
             ptrdiff_t i = lc-1;
-            limb_t n = limbs[i-ls];
+            ulimb_t n = limbs[i-ls];
             for (; i > ls; i--) {
-                limb_t m = limbs[i-ls-1];
+                ulimb_t m = limbs[i-ls-1];
                 limbs[i] = (n << shamt | m >> (-shamt & lsm));
                 n = m;
             }
@@ -186,21 +185,21 @@ struct wideint
                         : shamt < 0 ? nb - shamt : shamt % nb;
         size_t ls = shamt >> ll2;
         shamt -= ls << ll2;
-        limb_t s = is_signed && sign_bit();
+        ulimb_t s = is_signed && sign_bit();
         if (shamt == 0) {
             for (size_t i = 0; i < lc-ls; i++) {
                 limbs[i] = limbs[i+ls];
             }
         } else {
             size_t i = 0;
-            limb_t n = limbs[i+ls];
+            ulimb_t n = limbs[i+ls];
             for (; i < lc-ls-1; i++) {
-                limb_t m = limbs[i+ls+1];
+                ulimb_t m = limbs[i+ls+1];
                 limbs[i] = (n >> shamt | m << (-shamt & lsm));
                 n = m;
             }
             /* arithmetic shift if signed and this word is the last word */
-            limb_t lw = s && (i == lc-1) ? slimb_t(n) >> shamt : n >> shamt;
+            ulimb_t lw = s && (i == lc-1) ? slimb_t(n) >> shamt : n >> shamt;
             limbs[i] = lw | -s << ((nb-shamt-1) & lsm);
         }
         for (size_t i = lc-ls; i < lc; i++) {

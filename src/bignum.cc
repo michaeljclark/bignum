@@ -5,8 +5,8 @@
 
 #include "bignum.h"
 
-using limb_t = bignum::limb_t;
-using limb2_t = bignum::limb2_t;
+using ulimb_t = bignum::ulimb_t;
+using udlimb_t = bignum::udlimb_t;
 
 
 /*--------------.
@@ -18,14 +18,14 @@ bignum::bignum(const signedness s, const bitwidth bits)
 	: limbs{0}, s(s), bits(bits) {}
 
 /*! integral constructor */
-bignum::bignum(const limb_t n, const signedness s, const bitwidth bits)
+bignum::bignum(const ulimb_t n, const signedness s, const bitwidth bits)
 	: limbs{n}, s(s), bits(bits)
 {
 	_contract();
 }
 
 /*! array constructor */
-bignum::bignum(const std::initializer_list<limb_t> l, const signedness s, const bitwidth bits)
+bignum::bignum(const std::initializer_list<ulimb_t> l, const signedness s, const bitwidth bits)
 	: limbs(l), s(s), bits(bits)
 {
 	_contract();
@@ -72,7 +72,7 @@ bignum::bignum(const bignum&& operand) noexcept
 `----------------------*/
 
 /*! integral copy assignment operator */
-bignum& bignum::operator=(const limb_t l)
+bignum& bignum::operator=(const ulimb_t l)
 {
 	_resize(1);
 	limbs[0] = l;
@@ -141,10 +141,10 @@ size_t bignum::num_limbs() const { return limbs.size(); }
 size_t bignum::max_limbs() const { return ((bits - 1) >> limb_shift) + 1; }
 
 /*! access word at limb offset */
-limb_t bignum::limb_at(size_t n) const { return n < num_limbs() ? limbs[n] : 0; }
+ulimb_t bignum::limb_at(size_t n) const { return n < num_limbs() ? limbs[n] : 0; }
 
 /*! limb_mask at limb offset */
-limb_t bignum::limb_mask(size_t n) const
+ulimb_t bignum::limb_mask(size_t n) const
 {
     if (bits == 0) return -1;
     if (n < (bits >> limb_shift)) return -1;
@@ -191,10 +191,10 @@ bool bignum::sign_bit() const
 bignum& bignum::operator+=(const bignum &operand)
 {
 	_expand(operand);
-	limb_t carry = 0;
+	ulimb_t carry = 0;
 	for (size_t i = 0; i < num_limbs(); i++) {
-		limb_t old_val = limbs[i];
-		limb_t new_val = old_val + operand.limb_at(i) + carry;
+		ulimb_t old_val = limbs[i];
+		ulimb_t new_val = old_val + operand.limb_at(i) + carry;
 		limbs[i] = new_val;
 		carry = new_val < old_val;
 	}
@@ -208,10 +208,10 @@ bignum& bignum::operator+=(const bignum &operand)
 bignum& bignum::operator-=(const bignum &operand)
 {
 	_expand(operand);
-	limb_t borrow = 0;
+	ulimb_t borrow = 0;
 	for (size_t i = 0; i < num_limbs(); i++) {
-		limb_t old_val = limbs[i];
-		limb_t new_val = old_val - operand.limb_at(i) - borrow;
+		ulimb_t old_val = limbs[i];
+		ulimb_t new_val = old_val - operand.limb_at(i) - borrow;
 		limbs[i] = new_val;
 		borrow = new_val > old_val;
 	}
@@ -230,10 +230,10 @@ bignum& bignum::operator<<=(size_t shamt)
 	_contract();
 	if (!shamt) return *this;
 
-	limb_t carry = 0;
+	ulimb_t carry = 0;
 	for (size_t j = 0; j < num_limbs(); j++) {
-		limb_t old_val = limbs[j];
-		limb_t new_val = (old_val << shamt) | carry;
+		ulimb_t old_val = limbs[j];
+		ulimb_t new_val = (old_val << shamt) | carry;
 		limbs[j] = new_val;
 		carry = old_val >> (limb_bits - shamt);
 	}
@@ -257,10 +257,10 @@ bignum& bignum::operator>>=(size_t shamt)
 	}
 	if (!shamt) return *this;
 
-	limb_t carry = -(s.is_signed && sign_bit()) << (shamt-1);
+	ulimb_t carry = -(s.is_signed && sign_bit()) << (shamt-1);
 	for (size_t j = num_limbs(); j > 0; j--) {
-		limb_t old_val = limbs[j - 1];
-		limb_t new_val = (old_val >> shamt) | carry;
+		ulimb_t old_val = limbs[j - 1];
+		ulimb_t new_val = (old_val >> shamt) | carry;
 		limbs[j - 1] = new_val;
 		carry = old_val << (limb_bits - shamt);
 	}
@@ -455,11 +455,11 @@ void bignum::mult(const bignum &multiplicand, const bignum multiplier, bignum &r
 	size_t m = multiplicand.num_limbs(), n = multiplier.num_limbs();
 	size_t k = std::min(multiplicand.max_limbs(), m + n);
 	result._resize(k);
-	limb_t carry = 0;
-	limb2_t mj = multiplier.limbs[0];
+	ulimb_t carry = 0;
+	udlimb_t mj = multiplier.limbs[0];
 	for (size_t i = 0; i < m && i < k; i++) {
-		limb2_t t = limb2_t(multiplicand.limbs[i]) * mj + carry;
-		result.limbs[i] = limb_t(t);
+		udlimb_t t = udlimb_t(multiplicand.limbs[i]) * mj + carry;
+		result.limbs[i] = ulimb_t(t);
 		carry = t >> limb_bits;
 	}
 	if (m < k) {
@@ -469,8 +469,8 @@ void bignum::mult(const bignum &multiplicand, const bignum multiplier, bignum &r
 		carry = 0;
 		mj = multiplier.limbs[j];
 		for (size_t i = 0; i < m && i + j < k; i++) {
-			limb2_t t = limb2_t(multiplicand.limbs[i]) * mj + limb2_t(result.limbs[i + j]) + carry;
-			result.limbs[i + j] = limb_t(t);
+			udlimb_t t = udlimb_t(multiplicand.limbs[i]) * mj + udlimb_t(result.limbs[i + j]) + carry;
+			result.limbs[i + j] = ulimb_t(t);
 			carry = t >> limb_bits;
 		}
 		if (j + m < k) {
@@ -491,13 +491,13 @@ void bignum::divrem(const bignum &dividend, const bignum &divisor, bignum &quoti
 	ptrdiff_t m = dividend.num_limbs(), n = divisor.num_limbs();
 	quotient._resize(std::max(m - n + 1, ptrdiff_t(1)));
 	remainder._resize(n);
-	limb_t *q = quotient.limbs.data(), *r = remainder.limbs.data();
-	const limb_t *u = dividend.limbs.data(), *v = divisor.limbs.data();
+	ulimb_t *q = quotient.limbs.data(), *r = remainder.limbs.data();
+	const ulimb_t *u = dividend.limbs.data(), *v = divisor.limbs.data();
 
-	const limb2_t b = (1ULL << limb_bits); // Number base
-	limb_t *un, *vn;                       // Normalized form of u, v.
-	limb2_t qhat;                          // Estimated quotient digit.
-	limb2_t rhat;                          // A remainder.
+	const udlimb_t b = (1ULL << limb_bits); // Number base
+	ulimb_t *un, *vn;                       // Normalized form of u, v.
+	udlimb_t qhat;                          // Estimated quotient digit.
+	udlimb_t rhat;                          // A remainder.
 
 	if (m < n || n <= 0 || v[n-1] == 0) {
 		quotient = 0;
@@ -507,12 +507,12 @@ void bignum::divrem(const bignum &dividend, const bignum &divisor, bignum &quoti
 
 	// Single digit divisor
 	if (n == 1) {
-		limb2_t k = 0;
+		udlimb_t k = 0;
 		for (ptrdiff_t j = m - 1; j >= 0; j--) {
-			q[j] = limb_t((k*b + u[j]) / v[0]);
+			q[j] = ulimb_t((k*b + u[j]) / v[0]);
 			k = (k*b + u[j]) - q[j]*v[0];
 		}
-		r[0] = limb_t(k);
+		r[0] = ulimb_t(k);
 		quotient._contract();
 		remainder._contract();
 		return;
@@ -524,13 +524,13 @@ void bignum::divrem(const bignum &dividend, const bignum &divisor, bignum &quoti
 	// digit on the dividend; we do that unconditionally.
 
 	int s = clz(v[n-1]); // 0 <= s <= limb_bits.
-	vn = (limb_t *)alloca(sizeof(limb_t) * n);
+	vn = (ulimb_t *)alloca(sizeof(ulimb_t) * n);
 	for (ptrdiff_t i = n - 1; i > 0; i--) {
 		vn[i] = (v[i] << s) | (v[i-1] >> (limb_bits-s));
 	}
 	vn[0] = v[0] << s;
 
-	un = (limb_t *)alloca(sizeof(limb_t) * (m + 1));
+	un = (ulimb_t *)alloca(sizeof(ulimb_t) * (m + 1));
 	un[m] = u[m-1] >> (limb_bits-s);
 	for (ptrdiff_t i = m - 1; i > 0; i--) {
 		un[i] = (u[i] << s) | (u[i-1] >> (limb_bits-s));
@@ -547,27 +547,27 @@ void bignum::divrem(const bignum &dividend, const bignum &divisor, bignum &quoti
 			if (rhat < b) goto again;
 		}
 		// Multiply and subtract.
-		limb2_t k = 0;
+		udlimb_t k = 0;
 		hostint<limb_bits*2, true>::type t = 0;
 		for (ptrdiff_t i = 0; i < n; i++) {
 			unsigned long long p = qhat*vn[i];
 			t = un[i+j] - k - (p & ((1ULL<<limb_bits)-1));
-			un[i+j] = limb_t(t);
+			un[i+j] = ulimb_t(t);
 			k = (p >> limb_bits) - (t >> limb_bits);
 		}
 		t = un[j+n] - k;
-		un[j+n] = limb_t(t);
+		un[j+n] = ulimb_t(t);
 
-		q[j] = limb_t(qhat); // Store quotient digit.
+		q[j] = ulimb_t(qhat); // Store quotient digit.
 		if (t < 0) {         // If we subtracted too
 			q[j] = q[j] - 1; // much, add back.
 			k = 0;
 			for (ptrdiff_t i = 0; i < n; i++) {
 				t = un[i+j] + vn[i] + k;
-				un[i+j] = limb_t(t);
+				un[i+j] = ulimb_t(t);
 				k = t >> limb_bits;
 			}
-			un[j+n] = limb_t(un[j+n] + k);
+			un[j+n] = ulimb_t(un[j+n] + k);
 		}
 	}
 
@@ -659,7 +659,7 @@ bignum bignum::pow(size_t exp) const
 /*! helper for recursive divide and conquer conversion to string */
 static inline ptrdiff_t _to_string_c(const bignum &val, std::string &s, ptrdiff_t offset)
 {
-	limb2_t v = limb2_t(val.limb_at(0)) | (limb2_t(val.limb_at(1)) << bignum::limb_bits);
+	udlimb_t v = udlimb_t(val.limb_at(0)) | (udlimb_t(val.limb_at(1)) << bignum::limb_bits);
 	do {
 		s[--offset] = '0' + char(v % 10);
 	} while ((v /= 10) != 0);
@@ -730,7 +730,7 @@ std::string bignum::to_string(size_t radix) const
 			if (*this == 0) return "0b0";
 
 			std::string s("0b");
-			limb_t l1 = limbs.back();
+			ulimb_t l1 = limbs.back();
 			size_t n = limb_bits - clz(l1);
 			size_t t = n + ((num_limbs() - 1) << limb_shift);
 			s.resize(t + 2);
@@ -739,7 +739,7 @@ std::string bignum::to_string(size_t radix) const
 				*(i++) = '0' + ((l1 >> k) & 1);
 			}
 			for (ptrdiff_t j = num_limbs() - 2; j >= 0; j--) {
-				limb_t l = limbs[j];
+				ulimb_t l = limbs[j];
 				for (ptrdiff_t k = limb_bits - 1; k >= 0; k--) {
 					*(i++) = '0' + ((l >> k) & 1);
 				}
@@ -750,7 +750,7 @@ std::string bignum::to_string(size_t radix) const
 			if (*this == 0) return "0x0";
 
 			std::string s("0x");
-			limb_t l1 = limbs.back();
+			ulimb_t l1 = limbs.back();
 			size_t n = ((limb_bits >> 2) - (clz(l1) >> 2));
 			size_t t = n + ((num_limbs() - 1) << (limb_shift - 2));
 			s.resize(t + 2);
@@ -759,7 +759,7 @@ std::string bignum::to_string(size_t radix) const
 				*(i++) = hexdigits[(l1 >> (k << 2)) & 0xf];
 			}
 			for (ptrdiff_t j = num_limbs() - 2; j >= 0; j--) {
-				limb_t l = limbs[j];
+				ulimb_t l = limbs[j];
 				for (ptrdiff_t k = (limb_bits >> 2) - 1; k >= 0; k--) {
 					*(i++) = hexdigits[(l >> (k << 2)) & 0xf];
 				}
@@ -796,13 +796,13 @@ void bignum::from_string(const char *str, size_t len, size_t radix)
 			for (size_t i = 0; i < len; i += 18) {
 				size_t chunklen = i + 18 < len ? 18 : len - i;
 				std::string chunk(str + i, chunklen);
-				limb2_t num = strtoull(chunk.c_str(), nullptr, 10);
+				udlimb_t num = strtoull(chunk.c_str(), nullptr, 10);
 				if (chunklen == 18) {
 					*this *= tenp18;
 				} else {
 					*this *= bignum(10).pow(chunklen);
 				}
-				*this += bignum{limb_t(num), limb_t(num >> limb_bits)};
+				*this += bignum{ulimb_t(num), ulimb_t(num >> limb_bits)};
 			}
 			break;
 		}
@@ -810,13 +810,13 @@ void bignum::from_string(const char *str, size_t len, size_t radix)
 			for (size_t i = 0; i < len; i += 64) {
 				size_t chunklen = i + 64 < len ? 64 : len - i;
 				std::string chunk(str + i, chunklen);
-				limb2_t num = strtoull(chunk.c_str(), nullptr, 2);
+				udlimb_t num = strtoull(chunk.c_str(), nullptr, 2);
 				if (chunklen == 64) {
 					*this *= twop64;
 				} else {
 					*this *= bignum(2).pow(chunklen);
 				}
-				*this += bignum{limb_t(num), limb_t(num >> limb_bits)};
+				*this += bignum{ulimb_t(num), ulimb_t(num >> limb_bits)};
 			}
 			break;
 		}
@@ -824,13 +824,13 @@ void bignum::from_string(const char *str, size_t len, size_t radix)
 			for (size_t i = 0; i < len; i += 16) {
 				size_t chunklen = i + 16 < len ? 16 : len - i;
 				std::string chunk(str + i, chunklen);
-				limb2_t num = strtoull(chunk.c_str(), nullptr, 16);
+				udlimb_t num = strtoull(chunk.c_str(), nullptr, 16);
 				if (chunklen == 16) {
 					*this *= twop64;
 				} else {
 					*this *= bignum(16).pow(chunklen);
 				}
-				*this += bignum{limb_t(num), limb_t(num >> limb_bits)};
+				*this += bignum{ulimb_t(num), ulimb_t(num >> limb_bits)};
 			}
 			break;
 		}

@@ -40,6 +40,10 @@ template <typename T> void test_i256()
     assert(T::limb_count == sizeof(T)/sizeof(typename T::ulimb_t));
 }
 
+#define ASSERT_EQ_48(v,a) \
+    DUMP(v); \
+    assert(v.limbs[0] == a);
+
 #define ASSERT_EQ_256(v,a,b,c,d) \
     DUMP(v); \
     assert(v.limbs[3] == a); \
@@ -89,6 +93,13 @@ void test_wideint()
         b |= (int256_t::num_bytes-i);
     }
     ASSERT_EQ_256(b,0x201f1e1d1c1b1a19ull,0x1817161514131211ull,0x100f0e0d0c0b0a09ull,0x0807060504030201ull);
+
+    int48_t g = 0x0807060504030201ull;
+    uint256_t h = g;
+    ASSERT_EQ_256(h,0x0000000000000000ull,0x0000000000000000ull,0x0000000000000000ull,0x0000060504030201ull);
+    g = d;
+    ASSERT_EQ_48(g, 0x0000ffff00ff00ffull);
+
 }
 
 int main(int argc, char const *argv[])

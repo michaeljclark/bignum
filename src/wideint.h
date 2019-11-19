@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstring>
 #include <array>
+#include <algorithm>
 
 #include "bits.h"
 #include "hostint.h"
@@ -63,9 +64,27 @@ struct wideint
         }
     }
 
-    /*! copy constructors */
+    /*! unsigned copy constructor */
     inline wideint(const wideint<bits,false> &o) : limbs(o.limbs) {};
+
+    /*! signed copy constructor */
     inline wideint(const wideint<bits,true> &o) : limbs(o.limbs) {};
+
+    /*! different size copy constructor */
+    template <size_t o_bits, bool o_signed>
+    inline wideint(const wideint<o_bits,o_signed> &o)
+    {
+        uint8_t *d = (uint8_t*)(void*)limbs.data();
+
+        size_t sz_min = std::min(sizeof(limbs), sizeof(o.limbs));
+        std::memcpy(d, o.limbs.data(), sz_min);
+
+        if (sizeof(limbs) > sizeof(o.limbs)) {
+            std::memset(d + sizeof(o.limbs), 0, sizeof(limbs) - sizeof(o.limbs));
+        }
+
+        limbs[lc-1] &= limb_mask(lc-1);
+    }
 
 
     /*----------------------.
@@ -81,10 +100,34 @@ struct wideint
         return *this;
     }
 
-    /*! wideint copy assignment operator */
-    inline wideint& operator=(const wideint<bits,false> &o) { std::memcpy(limbs,o.limbs,sizeof(limbs)); }
-    inline wideint& operator=(const wideint<bits,true> &o) { std::memcpy(limbs,o.limbs,sizeof(limbs)); }
+    /*! unsigned copy assignment operator */
+    inline wideint& operator=(const wideint<bits,false> &o)
+    {
+        std::memcpy(limbs,o.limbs,sizeof(limbs));}
 
+    /*! signed copy assignment operator */
+    inline wideint& operator=(const wideint<bits,true> &o)
+    {
+        std::memcpy(limbs,o.limbs,sizeof(limbs));
+    }
+
+    /*! different size copy assignment operator */
+    template <size_t o_bits, bool o_signed>
+    inline wideint& operator=(const wideint<o_bits,o_signed> &o)
+    {
+        uint8_t *d = (uint8_t*)(void*)limbs.data();
+
+        size_t sz_min = std::min(sizeof(limbs), sizeof(o.limbs));
+        std::memcpy(d, o.limbs.data(), sz_min);
+
+        if (sizeof(limbs) > sizeof(o.limbs)) {
+            std::memset(d + sizeof(o.limbs), 0, sizeof(limbs) - sizeof(o.limbs));
+        }
+
+        limbs[lc-1] &= limb_mask(lc-1);
+
+        return *this;
+    }
 
     /*-------------------------------.
     | limb and bit accessor methods. |

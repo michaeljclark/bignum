@@ -126,46 +126,27 @@ void test_multiply()
 {
     /* bignum multiplication */
     bignum b12 = bignum(2147483648) * bignum(2147483648);
-    DUMPB(b12);
+    assert(b12.to_string() == "4611686018427387904");
     bignum b13 = b12 * b12;
-    DUMPB(b13);
+    assert(b13.to_string() == "21267647932558653966460912964485513216");
     bignum b14 = bignum(2147483647) * bignum(2147483647);
-    DUMPB(b14);
+    assert(b14.to_string() == "4611686014132420609");
     bignum b15 = b14 * b14;
-    DUMPB(b15);
-    bignum b16 = b15 * b15;
-    DUMPB(b16);
+    assert(b15.to_string() == "21267647892944572736998860269687930881");
+    bignum b16 = b13 * b15;
+    assert(b16.to_string() == "452312847740768055613344954116656535546982460631814466461259655922420023296");
 
     /* wideint multiplication */
     uint256_t w12 = uint256_t(2147483648) * uint256_t(2147483648);
-    DUMP(w12);
+    assert(w12.to_string() == "4611686018427387904");
     uint256_t w13 = w12 * w12;
-    DUMP(w13);
+    assert(w13.to_string() == "21267647932558653966460912964485513216");
     uint256_t w14 = uint256_t(2147483647) * uint256_t(2147483647);
-    DUMP(w14);
+    assert(w14.to_string() == "4611686014132420609");
     uint256_t w15 = w14 * w14;
-    DUMP(w15);
-    uint256_t w16 = w15 * w15;
-    DUMP(w16);
-
-    /* compare strings */
-    assert(b12.to_string() == w12.to_string());
-    assert(b13.to_string() == w13.to_string());
-    assert(b14.to_string() == w14.to_string());
-    assert(b15.to_string() == w15.to_string());
-    assert(b16.to_string() == w16.to_string());
-
-    /* print decimal strings */
-    printf("b12 = %s\n", b12.to_string().c_str());
-    printf("w12 = %s\n", w12.to_string().c_str());
-    printf("b13 = %s\n", b13.to_string().c_str());
-    printf("w13 = %s\n", w13.to_string().c_str());
-    printf("b14 = %s\n", b14.to_string().c_str());
-    printf("w14 = %s\n", w14.to_string().c_str());
-    printf("b15 = %s\n", b15.to_string().c_str());
-    printf("w15 = %s\n", w15.to_string().c_str());
-    printf("b16 = %s\n", b16.to_string().c_str());
-    printf("w16 = %s\n", w16.to_string().c_str());
+    assert(w15.to_string() == "21267647892944572736998860269687930881");
+    uint256_t w16 = w13 * w15;
+    assert(w16.to_string() == "452312847740768055613344954116656535546982460631814466461259655922420023296");
 }
 
 int main(int argc, char const *argv[])

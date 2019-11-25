@@ -7,6 +7,7 @@
 #include <cstring>
 #include <array>
 #include <algorithm>
+#include <string>
 
 #include "bits.h"
 #include "hostint.h"

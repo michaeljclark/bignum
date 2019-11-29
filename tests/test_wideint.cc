@@ -193,6 +193,13 @@ void test_ctz()
     assert(ctz(int256_t{0,0xff}) == 64);
 }
 
+void test_string()
+{
+    assert(int256_t("0xff") == 0xff);
+    assert(int256_t("0x807060504030201") == (int256_t{0x0807060504030201ull}));
+    assert(int256_t("0x100f0e0d0c0b0a090807060504030201") == (int256_t{0x0807060504030201ull,0x100f0e0d0c0b0a09ull}));
+}
+
 int main(int argc, char const *argv[])
 {
     test_i48<int48_t>();
@@ -202,4 +209,5 @@ int main(int argc, char const *argv[])
     test_multiply();
     test_clz();
     test_ctz();
+    test_string();
 }

@@ -109,6 +109,13 @@ struct wideint
         }
     }
 
+    /*! string */
+    inline wideint(std::string str)
+        : limbs{0}
+    {
+        from_string(str.c_str(), str.size(), 0);
+    }
+
 
     /*----------------------.
     | assignment operators. |
@@ -720,7 +727,7 @@ struct wideint
                     } else {
                         *this *= wideint(10).pow(chunklen);
                     }
-                    *this += wideint{ulimb_t(num), ulimb_t(num >> limb_bits)};
+                    *this += wideint{ulimb_t(num)};
                 }
                 break;
             }
@@ -734,7 +741,7 @@ struct wideint
                     } else {
                         *this *= wideint(2).pow(chunklen);
                     }
-                    *this += wideint{ulimb_t(num), ulimb_t(num >> limb_bits)};
+                    *this += wideint{ulimb_t(num)};
                 }
                 break;
             }
@@ -748,12 +755,12 @@ struct wideint
                     } else {
                         *this *= wideint(16).pow(chunklen);
                     }
-                    *this += wideint{ulimb_t(num), ulimb_t(num >> limb_bits)};
+                    *this += wideint{ulimb_t(num)};
                 }
                 break;
             }
             default: {
-                limbs.push_back(0);
+                limbs = { 0 };
             }
         }
     }

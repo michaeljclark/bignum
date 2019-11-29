@@ -6,8 +6,9 @@
 #include <cstdint>
 #include <cstring>
 #include <array>
-#include <algorithm>
 #include <string>
+#include <algorithm>
+#include <initializer_list>
 
 #include "bits.h"
 #include "hostint.h"
@@ -96,6 +97,16 @@ struct wideint
         }
 
         limbs[lc-1] &= limb_mask(lc-1);
+    }
+
+    /*! initializer list */
+    inline wideint(const std::initializer_list<ulimb_t> l)
+    {
+        auto li = l.begin();
+        for(size_t i = 0; i < lc; i++) {
+            if (li == l.end()) limbs[i] = 0;
+            else limbs[i] = *li++;
+        }
     }
 
 
@@ -513,6 +524,34 @@ struct wideint
     }
 
     /*----------------------.
+    | count leading zeros.  |
+    `----------------------*/
+
+    size_t count_leading_zeros() const
+    {
+        for (ptrdiff_t i = lc-1; i >= 0; i--) {
+            if (limbs[i] != 0) {
+                return clz(limbs[i]) + ((lc-1-i) << limb_shift);
+            }
+        }
+        return lc << limb_shift;
+    }
+
+    /*----------------------.
+    | count trailing zeros. |
+    `----------------------*/
+
+    size_t count_trailing_zeros() const
+    {
+        for (size_t i = 0; i < lc; i++) {
+            if (limbs[i] != 0) {
+                return ctz(limbs[i]) + (i << limb_shift);
+            }
+        }
+        return lc << limb_shift;
+    }
+
+    /*----------------------.
     | operator overloads.   |
     `----------------------*/
 
@@ -719,3 +758,15 @@ struct wideint
         }
     }
 };
+
+template <size_t bits, bool is_signed = true, size_t limb_bits_param = 64 >
+inline int clz(const wideint<bits,is_signed,limb_bits_param> &val) { return val.count_leading_zeros(); }
+
+template <size_t bits, bool is_signed = true, size_t limb_bits_param = 64 >
+inline int clz(wideint<bits,is_signed,limb_bits_param> &&val) { return val.count_leading_zeros(); }
+
+template <size_t bits, bool is_signed = true, size_t limb_bits_param = 64 >
+inline int ctz(const wideint<bits,is_signed,limb_bits_param> &val) { return val.count_trailing_zeros(); }
+
+template <size_t bits, bool is_signed = true, size_t limb_bits_param = 64 >
+inline int ctz(wideint<bits,is_signed,limb_bits_param> &&val) { return val.count_trailing_zeros(); }

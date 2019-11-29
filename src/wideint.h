@@ -322,8 +322,8 @@ struct wideint
 
         // skip zeros in the big end limbs
         size_t m = hwideint::lc, n = hwideint::lc, k = dhwideint::lc;
-        for (;m > 1 && a[m-1] == 0; m--);
-        for (;n > 1 && b[n-1] == 0; n--);
+        for (;m > 1 && b[m-1] == 0; m--);
+        for (;n > 1 && a[n-1] == 0; n--);
 
         uhlimb_t carry = 0;
         udhlimb_t mj = a[0];

@@ -18,7 +18,7 @@ void test_bit(int a, int b)
 	int tp = std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count();
 	int ts = std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count();
 
-	printf("bit: pow=%12d(ms), to_string=%12d(ms) digits=%ld\n", tp, ts, s.size());
+	printf("bit: pow=%12d(us), to_string=%12d(us) digits=%ld\n", tp, ts, s.size());
 }
 
 void test_gmp(int a, int b)
@@ -38,7 +38,7 @@ void test_gmp(int a, int b)
 	int tp = std::chrono::duration_cast<std::chrono::microseconds>(t2-t1).count();
 	int ts = std::chrono::duration_cast<std::chrono::microseconds>(t3-t2).count();
 
-	printf("gmp: pow=%12d(ms), to_string=%12d(ms) digits=%ld\n", tp, ts, strlen(s));
+	printf("gmp: pow=%12d(us), to_string=%12d(us) digits=%ld\n", tp, ts, strlen(s));
 
 	mpz_clear(base);
 	mpz_clear(result);

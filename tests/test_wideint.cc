@@ -198,6 +198,15 @@ void test_string()
     assert(int256_t("0xff") == 0xff);
     assert(int256_t("0x807060504030201") == (int256_t{0x0807060504030201ull}));
     assert(int256_t("0x100f0e0d0c0b0a090807060504030201") == (int256_t{0x0807060504030201ull,0x100f0e0d0c0b0a09ull}));
+    assert(int256_t("-1") == int256_t("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"));
+    assert(int256_t("-1").to_string() == "-1");
+    assert(int256_t("0").to_string() == "0");
+    // int256_t max value
+    assert(int256_t("57896044618658097711785492504343953926634992332820282019728792003956564819967").to_string() ==
+        "57896044618658097711785492504343953926634992332820282019728792003956564819967");
+    // int256_t min value.
+    assert(int256_t("-57896044618658097711785492504343953926634992332820282019728792003956564819968").to_string() ==
+        "-57896044618658097711785492504343953926634992332820282019728792003956564819968");
 }
 
 int main(int argc, char const *argv[])

@@ -83,6 +83,8 @@ struct wideint
     /*! signed copy constructor */
     inline wideint(const wideint<bits,true,limb_bits> &o) : limbs(o.limbs) {};
 
+    inline wideint& operator=(const wideint &rhs) = default;
+
     /*! different size copy constructor */
     template <size_t o_bits, bool o_signed, size_t o_limb_bits>
     inline wideint(const wideint<o_bits,o_signed,o_limb_bits> &o)

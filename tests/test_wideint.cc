@@ -198,6 +198,23 @@ void test_string()
     assert(int256_t("0xff") == 0xff);
     assert(int256_t("0x807060504030201") == (int256_t{0x0807060504030201ull}));
     assert(int256_t("0x100f0e0d0c0b0a090807060504030201") == (int256_t{0x0807060504030201ull,0x100f0e0d0c0b0a09ull}));
+    assert(int256_t("-1") == int256_t("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"));
+    assert(int256_t("-1").to_string() == "-1");
+    assert(int256_t("0").to_string() == "0");
+    // int256_t max value
+    std::string int256_max_s = "57896044618658097711785492504343953926634992332820282019728792003956564819967";
+    assert(int256_t(int256_max_s).to_string() == int256_max_s);
+    assert(int256_t::max() == int256_t(int256_max_s));
+
+    // int256_t min value.
+    std::string int256_min_s = "-57896044618658097711785492504343953926634992332820282019728792003956564819968";
+    assert(int256_t(int256_min_s).to_string() == int256_min_s);
+    assert(int256_t::min() == int256_t(int256_min_s));
+
+    std::string uint256_max_s = "115792089237316195423570985008687907853269984665640564039457584007913129639935";
+    assert(uint256_t::max() == uint256_t(uint256_max_s));
+    std::string uint256_min_s = "0";
+    assert(uint256_t::min() == uint256_t(uint256_min_s));
 }
 
 int main(int argc, char const *argv[])

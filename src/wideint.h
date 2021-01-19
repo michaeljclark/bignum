@@ -83,6 +83,8 @@ struct wideint
     /*! signed copy constructor */
     inline wideint(const wideint<bits,true,limb_bits> &o) : limbs(o.limbs) {};
 
+    inline wideint& operator=(const wideint &rhs) = default;
+
     /*! different size copy constructor */
     template <size_t o_bits, bool o_signed, size_t o_limb_bits>
     inline wideint(const wideint<o_bits,o_signed,o_limb_bits> &o)
@@ -181,6 +183,35 @@ struct wideint
         return is_signed && bits > 0 ? test_bit(bits - 1) : 0;
     }
 
+    static constexpr wideint one()
+    {
+        wideint m;               // 0
+        m.set_bit(0);
+        return m;
+    }
+
+    static constexpr wideint min()
+    {
+        if (is_signed) {
+            wideint m;            // 0
+            m.set_bit(bits - 1);  // min
+            return m;
+        } else {
+            return wideint();     // 0
+        }
+    }
+
+    static constexpr wideint max()
+    {
+        if (is_signed) {
+            wideint m = min();
+            return m - one();
+        } else {
+            wideint m;            // 0
+            m.op_not();           // all 1s
+            return m;
+        }
+    }
 
     /*---------------------------------------------.
     | add, subtract, shifts and logical operators. |
@@ -299,7 +330,7 @@ struct wideint
     }
 
     /*! bitwise not */
-    wideint& op_not() const
+    wideint& op_not()
     {
         for (size_t i = 0; i < lc; i++) {
             limbs[i] = ~limbs[i] & limb_mask(i);
@@ -308,7 +339,7 @@ struct wideint
     }
 
     /*! negate */
-    wideint& op_neg() const
+    wideint& op_neg()
     {
         for (size_t i = 0; i < lc; i++) {
             limbs[i] = ~limbs[i] & limb_mask(i);
@@ -641,15 +672,19 @@ struct wideint
             case 10: {
                 if (*this == 0) return "0";
 
-                std::string s;
+                std::string s, sign_str;
                 wideint v = *this, t = 10, q, r;
+                if (sign_bit()) {
+                    sign_str = "-";
+                    v.op_neg();
+                }
                 do {
                     op_divrem(v, t, q, r);
                     s.push_back('0' + char(r.limbs[0]));
                     v = q;
                 } while (v != 0);
 
-                return std::string(s.rbegin(), s.rend());;
+                return sign_str + std::string(s.rbegin(), s.rend());;
             }
             case 2: {
                 if (*this == 0) return "0b0";
@@ -702,15 +737,24 @@ struct wideint
     {
         static const wideint tenp18{0xde0b6b3a7640000ull};
         static const wideint twop64{0,1};
-        if (len > 2) {
-            if (strncmp(str, "0b", 2) == 0) {
-                radix = 2;
-                str += 2;
-                len -= 2;
-            } else if (strncmp(str, "0x", 2) == 0) {
-                radix = 16;
-                str += 2;
-                len -= 2;
+        bool isneg = false;
+
+        if (len > 1) {
+            if (strncmp(str, "-", 1) == 0) {
+                radix = 10;
+                str += 1;
+                len -= 1;
+                isneg = true;
+            } else if (len > 2) {
+                if (strncmp(str, "0b", 2) == 0) {
+                    radix = 2;
+                    str += 2;
+                    len -= 2;
+                } else if (strncmp(str, "0x", 2) == 0) {
+                    radix = 16;
+                    str += 2;
+                    len -= 2;
+                }
             }
         }
         if (radix == 0) {
@@ -728,6 +772,9 @@ struct wideint
                         *this *= wideint(10).pow(chunklen);
                     }
                     *this += wideint{ulimb_t(num)};
+                }
+                if (isneg) {
+                    this->op_neg();
                 }
                 break;
             }

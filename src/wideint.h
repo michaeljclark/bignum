@@ -83,6 +83,8 @@ struct wideint
     /*! signed copy constructor */
     inline wideint(const wideint<bits,true,limb_bits> &o) : limbs(o.limbs) {};
 
+    inline wideint& operator=(const wideint &rhs) = default;
+
     /*! different size copy constructor */
     template <size_t o_bits, bool o_signed, size_t o_limb_bits>
     inline wideint(const wideint<o_bits,o_signed,o_limb_bits> &o)
@@ -181,6 +183,35 @@ struct wideint
         return is_signed && bits > 0 ? test_bit(bits - 1) : 0;
     }
 
+    static constexpr wideint one()
+    {
+        wideint m;               // 0
+        m.set_bit(0);
+        return m;
+    }
+
+    static constexpr wideint min()
+    {
+        if (is_signed) {
+            wideint m;            // 0
+            m.set_bit(bits - 1);  // min
+            return m;
+        } else {
+            return wideint();     // 0
+        }
+    }
+
+    static constexpr wideint max()
+    {
+        if (is_signed) {
+            wideint m = min();
+            return m - one();
+        } else {
+            wideint m;            // 0
+            m.op_not();           // all 1s
+            return m;
+        }
+    }
 
     /*---------------------------------------------.
     | add, subtract, shifts and logical operators. |
